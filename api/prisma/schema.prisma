@@ -39,9 +39,9 @@ model User {
   password   String 
   cpf        String    @unique
   ra         String    @unique
-  created_at DateTime  @default(now()) @map("created_at")
-  update_at  DateTime  @updatedAt @map("update_at")
-  delete_at  DateTime? @map("deleted_at")
+  created_at DateTime  @default(now())
+  update_at  DateTime  @updatedAt 
+  delete_at  DateTime? 
   status     UserState @default(ACTIVE)
   userAd     UserAd[]
 
@@ -52,9 +52,9 @@ model User {
 model Subject {
   id         String       @id @default(uuid()) @db.Uuid
   name       String
-  created_at DateTime     @default(now()) @db.Timestamp(3)
-  update_at  DateTime     @db.Timestamp(3)
-  deleted_at DateTime?    @db.Timestamp(3)
+  created_at DateTime     @default(now())
+  update_at  DateTime     @updatedAt
+  deleted_at DateTime?    
   status     SubjectState @default(ACTIVE)
   userAd     UserAd[]
 
@@ -71,9 +71,9 @@ model Ad {
   useVoice   Boolean
   useVideo   Boolean
   status     AdSubjectState @default(ACTIVE)
-  created_at DateTime       @default(now()) @db.Timestamp(3)
-  update_at  DateTime       @db.Timestamp(3)
-  deleted_at DateTime?      @db.Timestamp(3)
+  created_at DateTime       @default(now()) 
+  update_at  DateTime       @updatedAt
+  deleted_at DateTime?     
   userAd     UserAd[]
 
   @@index([id, name])

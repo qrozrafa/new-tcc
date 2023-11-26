@@ -28,6 +28,11 @@ export class UserController {
     return this.userService.listUsers();
   }
 
+  @Get('deleted')
+  async getAllUsersDeleted() {
+    return this.userService.listUsersDeleted();
+  }
+
   @Get(':id')
   async getUserById(@Param('id', ParseUUIDPipe) id) {
     return this.userService.getUserById(id);
@@ -49,5 +54,10 @@ export class UserController {
   @Delete(`:id`)
   async deleteUser(@Param('id', ParseUUIDPipe) id) {
     return this.userService.deleteUser(id);
+  }
+
+  @Put(`restore/:id`)
+  async restoreUser(@Param('id', ParseUUIDPipe) id) {
+    return this.userService.restoreUser(id);
   }
 }

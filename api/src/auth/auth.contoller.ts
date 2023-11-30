@@ -1,17 +1,15 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthLoginDTO } from './dto/login-auth.dto';
 import { AuthRegisterDTO } from './dto/register-auth.dto';
 import { AuthForgetDTO } from './dto/forget-auth.dto';
 import { AuthResetDTO } from './dto/reset-auth.dto';
-import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { User } from 'src/decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('login')
   async login(@Body() body: AuthLoginDTO) {
@@ -20,7 +18,7 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() body: AuthRegisterDTO) {
-    return this.userService.createUser(body);
+    return this.authService.register(body);
   }
 
   @Post('forget')
@@ -31,5 +29,11 @@ export class AuthController {
   @Post('reset')
   async reset(@Body() { password, token }: AuthResetDTO) {
     return this.authService.reset(password, token);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('check')
+  async check(@User() user) {
+    return { user };
   }
 }

@@ -13,6 +13,12 @@ enum UserState {
   DELETED
 }
 
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
 enum SubjectState {
   ACTIVE
   SUSPENDED
@@ -39,6 +45,7 @@ model User {
   password   String 
   cpf        String    @unique
   ra         String    @unique
+  role       UserRole  @default(USER)
   created_at DateTime  @default(now())
   update_at  DateTime  @updatedAt 
   delete_at  DateTime? 

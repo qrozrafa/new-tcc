@@ -3,12 +3,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdatePutUserDto } from './dto/update-put-user.dto';
 import { UpdatePatchUserDto } from './dto/update-patch-user.dto';
+import * as bcrypy from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createUser(data: CreateUserDto) {
+    data.password = await bcrypy.hash(data.password, await bcrypy.genSalt());
     return await this.prisma.user.create({
       data,
     });
@@ -33,6 +35,7 @@ export class UserService {
 
   async updateUser(id: string, data: UpdatePutUserDto) {
     await this.exists(id);
+    data.password = await bcrypy.hash(data.password, await bcrypy.genSalt());
     return await this.prisma.user.update({
       where: {
         id,
@@ -43,6 +46,7 @@ export class UserService {
 
   async updatePartialUser(id: string, data: UpdatePatchUserDto) {
     await this.exists(id);
+    data.password = await bcrypy.hash(data.password, await bcrypy.genSalt());
     return await this.prisma.user.update({
       where: {
         id,

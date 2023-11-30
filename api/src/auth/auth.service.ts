@@ -1,24 +1,60 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-
+import { AuthRegisterDTO } from './dto/register-auth.dto';
+import { UserService } from 'src/user/user.service';
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
+  private audience = 'users';
+  private issuer = 'auth';
   constructor(
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
+    private readonly userService: UserService,
   ) {}
 
-  async createToken(email: string, password: string) {
-    const payload = { email, password };
+  async createToken(user: User) {
+    if (user.status === 'DELETED') {
+      throw new UnauthorizedException('Usuário não existe');
+    }
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(
+        {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        },
+        {
+          expiresIn: '7d',
+          subject: user.id,
+          issuer: this.issuer,
+          audience: this.audience,
+        },
+      ),
     };
   }
 
-  async checkToken(token: string) {
+  checkToken(token: string) {
     try {
-      this.jwtService.verify(token);
+      const data = this.jwtService.verify(token, {
+        audience: this.audience,
+        issuer: this.issuer,
+      });
+      return data;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  isValidToken(token: string) {
+    try {
+      this.checkToken(token);
       return true;
     } catch (error) {
       return false;
@@ -26,17 +62,24 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const user = this.prisma.user.findFirst({
+    const user = await this.prisma.user.findFirst({
       where: {
         email,
-        password,
       },
     });
+
+    if (user.status === 'DELETED') {
+      throw new UnauthorizedException('Usuário não existe');
+    }
 
     if (!user) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
-    return user;
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new UnauthorizedException('Credenciais inválidas');
+    }
+    return this.createToken(user);
   }
 
   async forget(email: string) {
@@ -46,7 +89,7 @@ export class AuthService {
       },
     });
 
-    if (!user) {
+    if (!user || (await user).status === 'DELETED') {
       throw new UnauthorizedException('Email não encontrado');
     }
 
@@ -57,19 +100,13 @@ export class AuthService {
 
   async reset(password: string, token: string) {
     // TODO: Implementar verificação de token
-    const user = {
-      where: {
-        token,
-      },
-    };
 
-    if (!user) {
-      throw new UnauthorizedException('Token inválido');
-    }
-
+    const tokenAccess = token;
     const id = '1';
 
-    await this.prisma.user.update({
+    console.log(tokenAccess);
+
+    const user = await this.prisma.user.update({
       where: {
         id,
       },
@@ -78,6 +115,12 @@ export class AuthService {
       },
     });
 
-    return true;
+    return this.createToken(user);
+  }
+
+  async register(data: AuthRegisterDTO) {
+    const user = await this.userService.createUser(data);
+
+    return this.createToken(user);
   }
 }

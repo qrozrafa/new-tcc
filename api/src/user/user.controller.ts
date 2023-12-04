@@ -24,13 +24,12 @@ import { AuthGuard } from 'src/guards/auth.guard';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Roles(Role.ADMIN)
   @Post()
   async create(@Body() data: CreateUserDto) {
     return this.userService.createUser(data);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER)
   @Get()
   async getAllUsers() {
     return this.userService.listUsers();
@@ -42,19 +41,19 @@ export class UserController {
     return this.userService.listUsersDeleted();
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER)
   @Get(':id')
   async getUserById(@Param('id', ParseUUIDPipe) id) {
     return this.userService.getUserById(id);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER)
   @Put(`:id`)
   async update(@Param('id', ParseUUIDPipe) id, @Body() data: UpdatePutUserDto) {
     return this.userService.updateUser(id, data);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER)
   @Patch(`:id`)
   async partialUpdate(
     @Param('id', ParseUUIDPipe) id,
@@ -63,13 +62,13 @@ export class UserController {
     return this.userService.updatePartialUser(id, data);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER)
   @Delete(`:id`)
   async deleteUser(@Param('id', ParseUUIDPipe) id) {
     return this.userService.deleteUser(id);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.USER)
   @Put(`restore/:id`)
   async restoreUser(@Param('id', ParseUUIDPipe) id) {
     return this.userService.restoreUser(id);

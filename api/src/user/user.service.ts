@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -17,7 +18,17 @@ export class UserService {
   }
 
   async listUsers() {
-    return await this.prisma.user.findMany({ where: { status: 'ACTIVE' } });
+    const users = await this.prisma.user.findMany({
+      where: { status: 'ACTIVE', role: 'USER' },
+    });
+
+    if (users) {
+      const usersWithoutPassword = users.map((user) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      return usersWithoutPassword;
+    }
   }
 
   async listUsersDeleted() {
@@ -26,11 +37,16 @@ export class UserService {
 
   async getUserById(id: string) {
     await this.exists(id);
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
     });
+
+    if (user) {
+      const { password, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    }
   }
 
   async updateUser(id: string, data: UpdatePutUserDto) {
@@ -62,7 +78,7 @@ export class UserService {
         id,
       },
       data: {
-        delete_at: new Date(),
+        deletedAt: new Date(),
         status: 'DELETED',
       },
     });
@@ -75,7 +91,7 @@ export class UserService {
         id,
       },
       data: {
-        delete_at: null,
+        deletedAt: null,
         status: 'ACTIVE',
       },
     });

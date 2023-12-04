@@ -19,7 +19,7 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  async createToken(user: User) {
+  async createToken(user: User): Promise<any> {
     if (user.status === 'DELETED') {
       throw new UnauthorizedException('Usuário não existe');
     }
@@ -29,6 +29,7 @@ export class AuthService {
           id: user.id,
           email: user.email,
           name: user.name,
+          role: user.role,
         },
         {
           expiresIn: '7d',

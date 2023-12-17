@@ -9,8 +9,6 @@ export default function Home() {
   const router = useRouter()
   const user = useUserStore.getState().state.user
   const auth = useAuthStore.getState().state.token
-
-  console.log(user, auth)
   
   return (
     <>

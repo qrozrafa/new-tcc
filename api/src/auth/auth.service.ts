@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BadRequestException,
   Injectable,
@@ -23,7 +24,7 @@ export class AuthService {
     if (user.status === 'DELETED') {
       throw new UnauthorizedException('Usuário não existe');
     }
-    return {
+    const token = {
       access_token: this.jwtService.sign(
         {
           id: user.id,
@@ -38,6 +39,13 @@ export class AuthService {
           audience: this.audience,
         },
       ),
+    };
+
+    const { password, ...userWithoutPassword } = user;
+
+    return {
+      ...token,
+      user: userWithoutPassword,
     };
   }
 

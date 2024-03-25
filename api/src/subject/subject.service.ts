@@ -1,10 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserAdService } from 'src/user-ad/user-ad.service';
+import { UserService } from 'src/user/user.service';
+import { AdService } from 'src/ad/ad.service';
 
 @Injectable()
 export class SubjectService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly userAdService: UserAdService,
+    private readonly userService: UserService,
+    private readonly adService: AdService,
+  ) {}
   async createSubject(data: CreateSubjectDto) {
     return await this.prisma.subject.create({
       data,
@@ -12,7 +20,45 @@ export class SubjectService {
   }
 
   async listSubjects() {
-    return await this.prisma.subject.findMany({ where: { status: 'ACTIVE' } });
+    const subjects = await this.prisma.subject.findMany({
+      where: { status: 'ACTIVE' },
+    });
+
+    if (subjects) {
+      const subjectAdsWhithCount = await Promise.all(
+        subjects.map(async (subject) => {
+          const subjectAd = await this.userAdService.getSubjectAds(subject.id);
+          const countAds = subjectAd.length;
+          return {
+            ...subject,
+            countAds,
+          };
+        }),
+      );
+      return subjectAdsWhithCount;
+    }
+  }
+
+  async listSubjectAdsForUser(subjectId: string) {
+    const subjectAds = await this.userAdService.getSubjectAds(subjectId);
+
+    if (subjectAds) {
+      const detailsUserAndAds = await Promise.all(
+        subjectAds.map(async (subjectAd) => {
+          const detailUser = await this.userService.getUserById(
+            subjectAd.userId,
+          );
+          const detailAd = await this.adService.getAdById(subjectAd.adId);
+          return {
+            ...subjectAd,
+            detailUser,
+            detailAd,
+          };
+        }),
+      );
+
+      return detailsUserAndAds;
+    }
   }
 
   async listSubjectDeleted() {

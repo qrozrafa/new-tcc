@@ -9,4 +9,8 @@ export class UserAdController {
   async listUserAds() {
     return await this.userAdService.getUsersAds();
   }
+  @Get(':subjectId')
+  async listSubjectAds(subjectId: string) {
+    return await this.userAdService.getSubjectAds(subjectId);
+  }
 }

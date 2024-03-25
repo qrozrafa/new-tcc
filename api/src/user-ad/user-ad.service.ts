@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserAdDto } from './dto/create-user-ad.dto';
@@ -27,6 +28,16 @@ export class UserAdService {
         status: 'ACTIVE',
       },
     });
+  }
+  async getSubjectAds(subjectId: string) {
+    const subjectAds = await this.prismaService.userAd.findMany({
+      where: {
+        status: 'ACTIVE',
+        subjectId: subjectId,
+      },
+    });
+
+    return subjectAds;
   }
 
   async deleteUserAd(adId: string, prismaHandler?: any): Promise<any> {

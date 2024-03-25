@@ -48,7 +48,7 @@ export class AdService {
     return userAd;
   }
 
-  async listAdsAcive() {
+  async listAdsActive() {
     return await this.prismaService.ad.findMany({
       where: {
         status: 'ACTIVE',

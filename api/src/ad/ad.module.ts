@@ -11,8 +11,8 @@ import { UserAdModule } from 'src/user-ad/user-ad.module';
   imports: [
     PrismaModule,
     forwardRef(() => AuthModule),
-    forwardRef(() => SubjectModule),
     forwardRef(() => UserModule),
+    forwardRef(() => SubjectModule),
     forwardRef(() => UserAdModule),
   ],
   controllers: [AdController],

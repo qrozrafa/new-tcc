@@ -31,6 +31,20 @@ export class UserService {
     }
   }
 
+  async listUsersAdmin() {
+    const users = await this.prisma.user.findMany({
+      where: { status: 'ACTIVE', role: 'ADMIN' },
+    });
+
+    if (users) {
+      const usersWithoutPassword = users.map((user) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      return usersWithoutPassword;
+    }
+  }
+
   async listUsersDeleted() {
     return await this.prisma.user.findMany({ where: { status: 'DELETED' } });
   }

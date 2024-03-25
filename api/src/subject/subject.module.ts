@@ -5,6 +5,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
 import { AdModule } from 'src/ad/ad.module';
+import { UserAdModule } from 'src/user-ad/user-ad.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AdModule } from 'src/ad/ad.module';
     forwardRef(() => AuthModule),
     forwardRef(() => UserModule),
     forwardRef(() => AdModule),
+    forwardRef(() => UserAdModule),
   ],
   controllers: [SubjectController],
   providers: [SubjectService],

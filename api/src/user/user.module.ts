@@ -12,6 +12,7 @@ import { SubjectModule } from 'src/subject/subject.module';
 import { AdModule } from 'src/ad/ad.module';
 import { CheckUserIdAndRoleMiddleware } from 'src/middlewares/checkUserIdAndRole.middleware';
 import { JwtModule } from '@nestjs/jwt';
+import { UserAdModule } from 'src/user-ad/user-ad.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { JwtModule } from '@nestjs/jwt';
     forwardRef(() => AuthModule),
     forwardRef(() => SubjectModule),
     forwardRef(() => AdModule),
+    forwardRef(() => UserAdModule),
   ],
   controllers: [UserController],
   providers: [UserService],

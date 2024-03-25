@@ -1,17 +1,20 @@
 'use client'
-import Image from "next/image"
-import Logo from '../../../public/assets/images/logo.png'
 import { useForm } from "react-hook-form"
 import { login } from "@/service/login"
 import { useAuthStore } from "@/store/auth"
-import { Alert, Button, IconButton, InputAdornment, TextField } from '@mui/material'
-import { z } from 'zod';
+import { Alert, Button, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
+import { z } from 'zod'
 import { Visibility, VisibilityOff } from "@mui/icons-material"
 import { useRouter } from "next/navigation"
-import { getDataUserToken } from "@/service/user"
+import { useMutation } from "@tanstack/react-query"
+import { useUserStore } from "@/store/user"
 
-export default function Login() {
+type TLogin = {
+  onLogin: () => void;
+  onRegister: () => void;
+}
 
+export default function Login({ onLogin, onRegister }: TLogin) {
   const router = useRouter();
 
   const authSchema = z.object({
@@ -26,33 +29,37 @@ export default function Login() {
     showPassword: z.boolean().default(false),
   });
 
-  const { actions: { setToken }, state: { token } } = useAuthStore()
-  const { watch, formState: { errors }, clearErrors, setValue, setError } = useForm()
+  const { actions: { setToken }, state: { token } } = useAuthStore();
+  const { actions: { setUser }, state: { user } } = useUserStore();
+  const { watch, formState: { errors }, clearErrors, setValue, setError } = useForm();
 
 
-  async function handleSubmit() {
-   const data = {
-    email: watch('email'),
-    password: watch('password')
-   }
 
-   const response = await login(data)
+  const { mutate: handleSubmit, isPending: isLoading } = useMutation({
+    mutationFn: async () => {
+    const data = {
+      email: watch('email'),
+      password: watch('password')
+    };
 
-   if(response?.access_token) {
-    setToken(response?.access_token)
-    await handlerUserStore();
-   } else {
-    setError('email', { message: 'Email ou senha inválidos' })
-    setError('password', { message: 'Email ou senha inválidos' })
-   }
+    const response = await login(data);
 
-  }
+    if(response) {
+    setToken(response?.access_token);
+    setUser(response.user);
+    onLogin();
+    } else {
+    setError('email', { message: 'Email ou senha inválidos' });
+    setError('password', { message: 'Email ou senha inválidos' });
+    }
 
-  async function handlerUserStore() {
-    const response = await getDataUserToken()
+  }})
 
-    console.log(response)
-  }
+  // async function handlerUserStore() {
+  //   const response = await getDataUserToken()
+
+  //   console.log(response)
+  // }
 
   const handleClickShowPassword = () => {
     setValue('showPassword', !watch('showPassword'));
@@ -70,14 +77,16 @@ export default function Login() {
   }
 
   return (
-    <div className='flex flex-col w-fit m-auto gap-8 mt-20'>
-    <Image src={Logo} alt='logo duo study' style={{ alignSelf: 'center' }}/>
-    <div className='flex flex-col gap-4 justify-center bg-slate-200 p-8 rounded-lg'>
+    <div className="w-full flex flex-col justify-center gap-4">
+      <Typography variant="h6" className="text-center text-green-500" fontWeight={'bold'}>ENTRAR</Typography>
       {Object.keys(errors).length > 0 && (
         <Alert severity="error">Email ou Senha inválidos</Alert>
       )}
       <TextField
-        label="Email"
+        id="outlined-size-small"
+        variant="standard"
+        placeholder="Digite seu email"
+        label="Email:"
         type="email"
         color="success"
         value={watch('email')}
@@ -91,9 +100,19 @@ export default function Login() {
         size="small"
         autoFocus
         helperText={!!errors.email?.message}
+        sx={{
+          input: {color: 'white'},
+          label: {color: 'white'},
+          "& label.Mui-focused": {
+            color: 'white',
+          },
+        }}
       />
-      <TextField 
-        label="Senha"
+      <TextField
+        id="outlined-size-small" 
+        variant="standard"
+        placeholder="Digite sua senha"
+        label="Senha:"
         type={watch('showPassword') ? 'text' : 'password'}
         color="success"
         value={watch('password')}
@@ -120,6 +139,13 @@ export default function Login() {
           )
         }}
         helperText={!!errors.email?.message}
+        sx={{
+          input: {color: 'white'},
+          label: {color: 'white'},
+          "& label.Mui-focused": {
+            color: 'white',
+          },
+        }}
       />
     <div className='flex flex-col gap-4 justify-center'>
       <Button 
@@ -127,18 +153,16 @@ export default function Login() {
         color="success"
         type="submit"
         fullWidth
-        onClick={handleSubmit}
+        onClick={() => handleSubmit()}
         size="small"
-        disabled={!watch('email') || !watch('password')}
-        onLoad={handleSubmit}
-        className="bg-green-600"
+        disabled={!watch('email') || !watch('password') || isLoading}
+        className="bg-green-600 disabled:bg-zinc-500"
 
       >
         Entrar
       </Button>
 
-     <Button color="info" size="small" onClick={() => {router.push('/register')}}>Criar conta</Button>
-    </div>
+     <Button color="info" size="small" onClick={() => {onRegister()}}>Criar conta</Button>
     </div>
   </div>
   )

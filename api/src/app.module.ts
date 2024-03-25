@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { SubjectModule } from './subject/subject.module';
 import { AdModule } from './ad/ad.module';
+import { UserAdModule } from './user-ad/user-ad.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AdModule } from './ad/ad.module';
     forwardRef(() => AuthModule),
     forwardRef(() => SubjectModule),
     forwardRef(() => AdModule),
+    forwardRef(() => UserAdModule),
   ],
   controllers: [AppController],
   providers: [AppService],

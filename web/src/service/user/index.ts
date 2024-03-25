@@ -1,5 +1,5 @@
+import api from "@/middleware/api";
 import { DataRegisterUser } from "@/type/register";
-import api from "../api";
 
 export async function getDataUserToken() {
   try {

@@ -36,6 +36,12 @@ export class UserController {
   }
 
   @Roles(Role.ADMIN)
+  @Get('admins')
+  async getAllUsersAdmin() {
+    return this.userService.listUsersAdmin();
+  }
+
+  @Roles(Role.ADMIN)
   @Get('deleted')
   async getAllUsersDeleted() {
     return this.userService.listUsersDeleted();

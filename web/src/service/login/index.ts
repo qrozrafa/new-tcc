@@ -1,4 +1,5 @@
-import api from "../api";
+import api from "@/middleware/api";
+import { UserState } from "@/store/user";
 
 export type LoginUser = {
   email: string;
@@ -7,6 +8,7 @@ export type LoginUser = {
 
 export type Token = {
   access_token: string;
+  user:  UserState;
 }
 
 export async function login(crentials: LoginUser): Promise<Token | undefined> {

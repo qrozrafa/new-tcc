@@ -87,6 +87,7 @@ model Ad {
   hourEnd   DateTime       @map("hour_end") @db.Time()
   useVoice  Boolean        @map("use_voice")
   useVideo  Boolean        @map("use_video")
+  linkCall  String         @default("") @map("link_call")
   status    AdSubjectState @default(ACTIVE)
   createdAt DateTime       @default(now()) @map("created_at")
   updatedAt DateTime       @updatedAt @map("updated_at")

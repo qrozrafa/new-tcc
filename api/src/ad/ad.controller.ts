@@ -30,7 +30,7 @@ export class AdController {
 
   @Get()
   async listAds() {
-    return this.adService.listAdsAcive();
+    return this.adService.listAdsActive();
   }
 
   @Get(':id')

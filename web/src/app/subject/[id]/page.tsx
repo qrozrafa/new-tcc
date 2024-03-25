@@ -65,27 +65,26 @@ export default function Subject() {
       )}
       {!loadingSubject && !loadingSubjectAds && (
         <div className='flex flex-col gap-4 justify-center p-8'>
-          <Typography variant='h4' className='text-white text-center font-bold'>Encontre seu colega de estudo em <span className='text-green-500'>{subject?.name}</span></Typography>
+          <Typography variant='h4' className='text-zinc-700 text-center font-bold'>Encontre seu colega de estudo em <span className='text-green-500 font-bold'>{subject?.name}</span></Typography>
 
-          <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-700 py-4 px-3 flex justify-between rounded-lg`}>
+          <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex justify-between rounded-lg`}>
             <TextField
               variant="standard"
               color="success"
               placeholder="Digita a matéria"
               className="w-full border-none"
-              sx={{input: {color: 'white'}}}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />            
             <div className={`self-center`}>
-              <Search/>
+              <Search color="success"/>
             </div>
           </div>
 
           {filteredAds?.length === 0 && (
-            <div className={`w-full mx-auto mt-4 bg-zinc-700 py-4 px-3 flex justify-between rounded-lg`}>
+            <div className={`w-full mx-auto mt-4 bg-zinc-200 py-4 px-3 flex justify-between rounded-lg`}>
             <div className='flex flex-col'>
-              <Typography variant='subtitle1' className='text-white font-bold'>Não encontrou o seu parceiro?</Typography>
+              <Typography variant='h6' className='text-green-500 font-bold'>Não encontrou o seu parceiro?</Typography>
               <Typography variant='subtitle2' className='text-zinc-400'>Publique um anúncio para encontrar novos estudantes</Typography>
             </div>
             
@@ -96,18 +95,18 @@ export default function Subject() {
           )}
 
           {filteredAds?.length > 0 && (
-            <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-700 py-4 px-3 flex flex-col justify-between rounded-lg`}>
+            <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex flex-col justify-between rounded-lg`}>
               {filteredAds?.map(ad => (
                 <>
                   <div className="flex justify-between">
                     <div className={`flex flex-col gap-1`}>
                       <Typography variant='body1'className='font-bold text-green-500'>{ad.nameAd}</Typography>
-                      <Typography variant='body1'>Nome: <b>{ad.detailUser.name}</b></Typography>
-                      <Typography variant='body1'>Dias: <b>{weekDaysSelected(ad.detailAd.weekDay)}</b></Typography>
-                      <Typography variant='body1'>Horário: <b>{format(ad.detailAd.hourStart, 'HH:mm')} - {format(ad.detailAd.hourEnd, 'HH:mm')}</b></Typography>
+                      <Typography variant='body1' className="text-zinc-700">Nome: <b>{ad.detailUser.name}</b></Typography>
+                      <Typography variant='body1'className="text-zinc-700">Dias: <b>{weekDaysSelected(ad.detailAd.weekDay)}</b></Typography>
+                      <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad.detailAd.hourStart, 'HH:mm')} - {format(ad.detailAd.hourEnd, 'HH:mm')}</b></Typography>
                       <div className="flex gap-1">
-                        <Mic className={`${ad.detailAd.useVoice ? 'text-green-500' : 'text-gray-400'}`} />
-                        <VideoCameraFront className={`${ad.detailAd.useVideo ? 'text-green-500' : 'text-gray-400'}`} />
+                        <Mic className={`${ad.detailAd.useVoice ? 'text-green-500' : 'text-gray-700'}`} />
+                        <VideoCameraFront className={`${ad.detailAd.useVideo ? 'text-green-500' : 'text-gray-700'}`} />
                       </div>
                     </div>
                     <div className={`self-end`}>

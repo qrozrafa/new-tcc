@@ -21,19 +21,11 @@ export default function Nav() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color='transparent'>
         <Toolbar>
-          <IconButton
-            size="large"
-            aria-label="account of current user"
-            aria-controls="menu-appbar"
-            aria-haspopup="true"
-            color="inherit"
-          >
-            <AccountCircle />
-          </IconButton>
+          <AccountCircle sx={{ color: 'rgb(63 63 70)', mr: 1 }}/>
           <Typography
             variant="h6"
             component="div"
-            sx={{ flexGrow: 1 }}
+            sx={{ flexGrow: 1, color: 'rgb(63 63 70)' }}
             className='underline cursor-pointer'
             onClick={() => {
               if (!auth) {
@@ -57,6 +49,7 @@ export default function Nav() {
                   window.location.replace('/');
                 }}
                 color="inherit"
+                sx={{color: 'rgb(63 63 70)'}}
               >
                 <Logout />
               </IconButton>

@@ -23,7 +23,7 @@ export default function Home() {
   return (
     <>
       <Layout>
-        <Typography variant='h1'>Bem-vindo</Typography>
+        <Typography variant='h1' className='text-zinc-700'>Bem-vindo</Typography>
       </Layout>
     </>
   )

@@ -71,7 +71,7 @@ export default function Home() {
           )}
           {subjects && subjects.length > 0 && (
             <>
-              <Typography variant='h2' className='text-white text-center font-bold'>Encontre seu <span className='text-red-600'>colega</span> de <span className='text-green-500'>estudo</span></Typography>
+              <Typography variant='h2' className='text-zinc-700 text-center font-bold'>Encontre seu <span className='text-red-600 font-bold'>colega</span> de <span className='text-green-500 font-bold'>estudo</span></Typography>
               <div className='w-full'>
                 <Splide  
                   options={{
@@ -90,10 +90,10 @@ export default function Home() {
                 >
                 {subjects.map((subject, index) => (    
                   <SplideSlide key={index} id={`splide-slide${index}`}>
-                    <div className='flex flex-col justify-between py-4 w-[180px] h-[240px] bg-zinc-700 rounded-lg cursor-pointer' onClick={() => router.push(`/subject/${subject.id}`)}>
+                    <div className='flex flex-col justify-between py-4 w-[180px] h-[240px] bg-zinc-300 rounded-lg cursor-pointer hover:bg-zinc-200' onClick={() => router.push(`/subject/${subject.id}`)}>
                       <Image alt='' src={setImageCard(subject.name as ImageCard)} width={96} height={96} className='self-center py-4'/>
                       <div className='align-bottom'>
-                        <Typography variant='subtitle1' textAlign='start' justifySelf={'end'} className='text-white px-2' fontWeight={'bold'}>{subject.name}</Typography>
+                        <Typography variant='subtitle1' textAlign='start' justifySelf={'end'} className='text-green-500 px-2' fontWeight={'bold'}>{subject.name}</Typography>
                         <Typography variant='subtitle2' textAlign='start' justifySelf={'end'} className='text-zinc-400 px-2'>{subject.countAds > 1 ? `${subject.countAds} anúncios` : `${subject.countAds} anúncio`}</Typography>
                       </div>
                     </div>
@@ -101,9 +101,9 @@ export default function Home() {
                 ))}
                 </Splide>
               </div>
-              <div className={`w-[calc(100%-60px)] mx-auto mt-4 bg-zinc-700 py-4 px-3 flex ${isMobile && 'flex-col'} justify-between rounded-lg`}>
+              <div className={`w-[calc(100%-60px)] mx-auto mt-4 bg-zinc-300 py-4 px-3 flex ${isMobile && 'flex-col'} justify-between rounded-lg`}>
                 <div className='flex flex-col'>
-                  <Typography variant='subtitle1' className='text-white font-bold'>Não encontrou o seu parceiro?</Typography>
+                  <Typography variant='h6' className='text-green-500 font-bold'>Não encontrou o seu parceiro?</Typography>
                   <Typography variant='subtitle2' className='text-zinc-400'>Publique um anúncio para encontrar novos estudantes</Typography>
                 </div>
                 

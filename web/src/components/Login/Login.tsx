@@ -11,10 +11,9 @@ import { useUserStore } from "@/store/user"
 
 type TLogin = {
   onLogin: () => void;
-  onRegister: () => void;
 }
 
-export default function Login({ onLogin, onRegister }: TLogin) {
+export default function Login({ onLogin }: TLogin) {
   const router = useRouter();
 
   const authSchema = z.object({
@@ -161,8 +160,6 @@ export default function Login({ onLogin, onRegister }: TLogin) {
       >
         Entrar
       </Button>
-
-     <Button color="info" size="small" onClick={() => {onRegister()}}>Criar conta</Button>
     </div>
   </div>
   )

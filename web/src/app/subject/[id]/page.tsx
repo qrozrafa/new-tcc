@@ -12,6 +12,7 @@ import { useParams } from "next/navigation";
 import { format } from 'date-fns';
 import { useState } from "react";
 import { useAuthStore } from "@/store/auth";
+import { NotFoundAd } from "@/components/NotFoundAd/NotFoundAd";
 
 export default function Subject() {
   const param = useParams();
@@ -29,7 +30,7 @@ export default function Subject() {
     staleTime: 0,
   });
 
-  const { data: subjectAds, isFetching: loadingSubjectAds } = useQuery<TAd[]>({
+  const {isFetching: loadingSubjectAds } = useQuery<TAd[]>({
     queryKey: ['subjectAds', param.id],
     queryFn: async () => {
       const response = await getSubjectAds(param.id as string)
@@ -67,7 +68,7 @@ export default function Subject() {
         <div className='flex flex-col gap-4 justify-center p-8'>
           <Typography variant='h4' className='text-zinc-700 text-center font-bold'>Encontre seu colega de estudo em <span className='text-green-500 font-bold'>{subject?.name}</span></Typography>
 
-          <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex justify-between rounded-lg`}>
+          <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 drop-shadow-lg flex justify-between rounded-lg`}>
             <TextField
               variant="standard"
               color="success"
@@ -82,20 +83,11 @@ export default function Subject() {
           </div>
 
           {filteredAds?.length === 0 && (
-            <div className={`w-full mx-auto mt-4 bg-zinc-200 py-4 px-3 flex justify-between rounded-lg`}>
-            <div className='flex flex-col'>
-              <Typography variant='h6' className='text-green-500 font-bold'>Não encontrou o seu parceiro?</Typography>
-              <Typography variant='subtitle2' className='text-zinc-400'>Publique um anúncio para encontrar novos estudantes</Typography>
-            </div>
-            
-            <div className={`self-center`}>
-              <Button variant='contained' color='error' size='small' className={`bg-red-500`} disabled={!Boolean(useAuthStore.getState().state.token)}>Publicar anúncio</Button>
-            </div>
-          </div>
+            <NotFoundAd />
           )}
 
           {filteredAds?.length > 0 && (
-            <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex flex-col justify-between rounded-lg`}>
+            <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 drop-shadow-lg flex flex-col justify-between rounded-lg`}>
               {filteredAds?.map(ad => (
                 <>
                   <div className="flex justify-between">

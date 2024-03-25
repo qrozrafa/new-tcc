@@ -39,3 +39,8 @@ export type DetailUser = {
   deletedAt: null;
   status:    string;
 }
+
+export type TOptions = {
+  label: string;
+  value: string;
+}

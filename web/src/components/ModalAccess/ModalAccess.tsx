@@ -13,9 +13,10 @@ const style = {
   transform: 'translate(-50%, -50%)',
   width: 400,
   bgcolor: 'rgb(63 63 70)',
+  borderRadius: 4,
   boxShadow: 24,
   p: 4,
-};
+}; 
 
 type TModalAccess = {
   open: boolean;
@@ -63,7 +64,7 @@ export default function ModalAccess({ open, handleClose }: TModalAccess) {
               <BottomNavigationAction label="Criar conta" icon={<PersonAddAlt1 />} />
             </BottomNavigation>
           </Box>
-            {tab === 0 ? <Login onLogin={handleClose} onRegister={() => setTab(1)}/> : <Register onRegister={handleClose}/>}
+            {tab === 0 ? <Login onLogin={handleClose}/> : <Register onRegister={handleClose}/>}
           </Box>
         </>
       </Modal>

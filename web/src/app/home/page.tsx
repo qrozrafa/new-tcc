@@ -29,10 +29,11 @@ import useScreenSize from '@/utils/resize'
 import { useRouter } from 'next/navigation'
 import { Layout } from '@/components/layout'
 import { useAuthStore } from '@/store/auth'
+import { NotFoundAd } from '@/components/NotFoundAd/NotFoundAd'
 
 export default function Home() {
-  const router = useRouter()
-  const isMobile = useScreenSize(688)
+  const router = useRouter();
+  const isMobile = useScreenSize(688);
 
   const { data: subjects, isFetching: loadingSubjects } = useQuery<TSubjects[]>({
     queryKey: ['subjects'],
@@ -77,6 +78,7 @@ export default function Home() {
                   options={{
                     width: window.innerWidth - 85,
                     fixedWidth: '180px',
+                    height: '250px',
                     gap: '16px',
                     perPage: isMobile ? 1 : 7.30,
                     perMove: 4,
@@ -90,7 +92,7 @@ export default function Home() {
                 >
                 {subjects.map((subject, index) => (    
                   <SplideSlide key={index} id={`splide-slide${index}`}>
-                    <div className='flex flex-col justify-between py-4 w-[180px] h-[240px] bg-zinc-300 rounded-lg cursor-pointer hover:bg-zinc-200' onClick={() => router.push(`/subject/${subject.id}`)}>
+                    <div className='flex flex-col justify-between py-4 w-[180px] h-[240px] bg-zinc-300 rounded-lg cursor-pointer hover:bg-zinc-200 hover:drop-shadow-lg' onClick={() => router.push(`/subject/${subject.id}`)}>
                       <Image alt='' src={setImageCard(subject.name as ImageCard)} width={96} height={96} className='self-center py-4'/>
                       <div className='align-bottom'>
                         <Typography variant='subtitle1' textAlign='start' justifySelf={'end'} className='text-green-500 px-2' fontWeight={'bold'}>{subject.name}</Typography>
@@ -101,16 +103,7 @@ export default function Home() {
                 ))}
                 </Splide>
               </div>
-              <div className={`w-[calc(100%-60px)] mx-auto mt-4 bg-zinc-300 py-4 px-3 flex ${isMobile && 'flex-col'} justify-between rounded-lg`}>
-                <div className='flex flex-col'>
-                  <Typography variant='h6' className='text-green-500 font-bold'>Não encontrou o seu parceiro?</Typography>
-                  <Typography variant='subtitle2' className='text-zinc-400'>Publique um anúncio para encontrar novos estudantes</Typography>
-                </div>
-                
-                <div className={`self-center ${isMobile && 'w-full mt-2' }}`}>
-                  <Button variant='contained' color='error' size='small' className={`bg-red-500 ${isMobile && 'w-full mt-2'}}`} disabled={!Boolean(useAuthStore.getState().state.token)}>Publicar anúncio</Button>
-                </div>
-              </div>
+              <NotFoundAd />
             </>
           )}
         </div>

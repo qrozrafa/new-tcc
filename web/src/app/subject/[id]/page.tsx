@@ -13,12 +13,15 @@ import { format } from 'date-fns';
 import { useState } from "react";
 import { useAuthStore } from "@/store/auth";
 import { NotFoundAd } from "@/components/NotFoundAd/NotFoundAd";
+import { useStore } from "zustand";
 
 export default function Subject() {
   const param = useParams();
 
   const [search, setSearch] = useState('');
   const [ads, setAds] = useState<TAd[]>([]);
+  const authStore = useStore(useAuthStore);
+  const { authenticated } = authStore;
 
 
   const { data: subject, isFetching: loadingSubject } = useQuery<TSubjects>({
@@ -68,7 +71,7 @@ export default function Subject() {
         <div className='flex flex-col gap-4 justify-center p-8'>
           <Typography variant='h4' className='text-zinc-700 text-center font-bold'>Encontre seu colega de estudo em <span className='text-green-500 font-bold'>{subject?.name}</span></Typography>
 
-          <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 drop-shadow-lg flex justify-between rounded-lg`}>
+          <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex justify-between rounded-lg`}>
             <TextField
               variant="standard"
               color="success"
@@ -87,18 +90,18 @@ export default function Subject() {
           )}
 
           {filteredAds?.length > 0 && (
-            <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 drop-shadow-lg flex flex-col justify-between rounded-lg`}>
+            <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex flex-col justify-between rounded-lg`}>
               {filteredAds?.map(ad => (
                 <>
                   <div className="flex justify-between">
                     <div className={`flex flex-col gap-1`}>
-                      <Typography variant='body1'className='font-bold text-green-500'>{ad.nameAd}</Typography>
+                      <Typography variant='body1'className='font-bold text-green-500'><b>{ad.nameAd}</b></Typography>
                       <Typography variant='body1' className="text-zinc-700">Nome: <b>{ad.detailUser.name}</b></Typography>
                       <Typography variant='body1'className="text-zinc-700">Dias: <b>{weekDaysSelected(ad.detailAd.weekDay)}</b></Typography>
                       <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad.detailAd.hourStart, 'HH:mm')} - {format(ad.detailAd.hourEnd, 'HH:mm')}</b></Typography>
                       <div className="flex gap-1">
                         <Mic className={`${ad.detailAd.useVoice ? 'text-green-500' : 'text-gray-700'}`} />
-                        <VideoCameraFront className={`${ad.detailAd.useVideo ? 'text-green-500' : 'text-gray-700'}`} />
+                        <VideoCameraFront className={`${ad.detailAd.useVideo ? 'text-green-500' : 'text-gray-300'}`} />
                       </div>
                     </div>
                     <div className={`self-end`}>
@@ -106,7 +109,7 @@ export default function Subject() {
                         variant='contained'
                         color='success'
                         size='small'
-                        disabled={!Boolean(useAuthStore.getState().state.token)}
+                        disabled={!authenticated}
                       >
                         Conectar
                       </Button>

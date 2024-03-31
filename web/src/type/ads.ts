@@ -44,3 +44,15 @@ export type TOptions = {
   label: string;
   value: string;
 }
+
+export type TFormAd = {
+  userId?:    string;
+  subjectId: string;
+  name:      string;
+  weekDay:   string[];
+  hourStart: Date;
+  hourEnd:   Date;
+  useVoice:  boolean;
+  useVideo:  boolean;
+  linkCall:  string;
+}

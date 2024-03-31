@@ -17,8 +17,8 @@ type TRegister =  {
 
 export default function Register({ onRegister }: TRegister) {
   const router = useRouter();
-  const { actions: { setToken }, state: { token } } = useAuthStore();
-  const { actions: { setUser }, state: { user } } = useUserStore();
+  const useAuth = useAuthStore();
+  const useUser = useUserStore();
 
   const registerAccount = z.object({
     name: z.string().min(4, 'Insira o seu nome'),
@@ -55,7 +55,7 @@ export default function Register({ onRegister }: TRegister) {
       const response = await createUser(data);
 
       if(response) {
-        setToken(response?.access_token)
+        useAuth.setToken(response?.access_token)
       }
     },
     onSuccess: async () => {
@@ -67,8 +67,8 @@ export default function Register({ onRegister }: TRegister) {
       const response = await login(data);
   
       if(response) {
-      setToken(response?.access_token);
-      setUser(response.user);
+      useAuth.setToken(response?.access_token);
+      useUser.setUser(response.user);
       onRegister();
       } 
     },
@@ -109,13 +109,6 @@ export default function Register({ onRegister }: TRegister) {
         size="small"
         required
         autoFocus
-        sx={{
-          input: {color: 'white'},
-          label: {color: 'white'},
-          "& label.Mui-focused": {
-            color: 'white',
-          },
-        }}
       />
       <TextField
         variant="standard"
@@ -132,13 +125,6 @@ export default function Register({ onRegister }: TRegister) {
         error={!!errors.email}
         size="small"
         required
-        sx={{
-          input: {color: 'white'},
-          label: {color: 'white'},
-          "& label.Mui-focused": {
-            color: 'white',
-          },
-        }}
       />
       <TextField
         variant="standard"
@@ -156,13 +142,6 @@ export default function Register({ onRegister }: TRegister) {
         size="small"
         required
         inputProps={{ maxLength: 11 }}
-        sx={{
-          input: {color: 'white'},
-          label: {color: 'white'},
-          "& label.Mui-focused": {
-            color: 'white',
-          },
-        }}
       />
       <TextField
         variant="standard"
@@ -180,13 +159,6 @@ export default function Register({ onRegister }: TRegister) {
         size="small"
         required
         inputProps={{ maxLength: 6 }}
-        sx={{
-          input: {color: 'white'},
-          label: {color: 'white'},
-          "& label.Mui-focused": {
-            color: 'white',
-          },
-        }}
       />
       <TextField
         variant="standard"
@@ -216,13 +188,6 @@ export default function Register({ onRegister }: TRegister) {
               </IconButton>
             </InputAdornment>
           )
-        }}
-        sx={{
-          input: {color: 'white'},
-          label: {color: 'white'},
-          "& label.Mui-focused": {
-            color: 'white',
-          },
         }}
       />
       <div className='flex flex-col gap-4 justify-center'>

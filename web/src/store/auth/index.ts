@@ -1,25 +1,17 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-export type AuthState = {
+
+export type AuthStoreProps = {
   token: string;
-}
-
-export type AuthActions = {
+  authenticated: boolean;
   setToken: (token: string) => void;
   removeToken: () => void;
 }
 
-export type Auth = {
-  state: AuthState;
-  actions: AuthActions;
-}
-
-export const useAuthStore = create<Auth>((set) => ({
-  state: {
-    token: '',
-  },
-  actions: {
-    setToken: (token: string) => set((state) => ({ state: { ...state.state, token } })),
-    removeToken: () => set((state) => ({ state: { ...state.state, token: '' } })),
-  }
-}));
+export const useAuthStore = create(persist<AuthStoreProps>((set, get) => ({
+  token: '',
+  authenticated: false,
+  setToken: (token: string) => set(() => ({ ...get(), token, authenticated: true })),
+  removeToken: () => set(() => ({ ...get(), token: '', authenticated: false })),
+}), {name: 'auth-store'}));

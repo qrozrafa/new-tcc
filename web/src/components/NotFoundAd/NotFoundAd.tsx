@@ -3,14 +3,17 @@ import useScreenSize from "@/utils/resize";
 import { Button, Typography } from "@mui/material";
 import { Fragment, useState } from "react";
 import ModalFormAd from "../ModalFormAd/ModalFormAd";
+import { useStore } from "zustand";
 
 export function NotFoundAd() {
   const isMobile = useScreenSize(688);
   const [openModal, setOpenModal] = useState(false);
+  const authStore = useStore(useAuthStore);
+  const { authenticated } = authStore;
 
   return (
     <Fragment>
-      <div className={`w-[calc(100%-60px)] mx-auto mt-4 bg-zinc-300 py-4 px-3 drop-shadow-lg flex ${isMobile && 'flex-col'} justify-between rounded-lg`}>
+      <div className={`w-full mx-auto mt-4 bg-zinc-200 py-4 px-3 flex ${isMobile && 'flex-col'} justify-between rounded-lg`}>
         <div className='flex flex-col'>
           <Typography variant='h6' className='text-green-500 font-bold'>Não encontrou o seu parceiro?</Typography>
           <Typography variant='subtitle2' className='text-zinc-400'>Publique um anúncio para encontrar novos estudantes</Typography>
@@ -22,7 +25,7 @@ export function NotFoundAd() {
             color='error'
             size='small'
             className={`bg-red-500 ${isMobile && 'w-full mt-2'}}`}
-            disabled={!Boolean(useAuthStore.getState().state.token)}
+            disabled={!authenticated}
             onClick={() => setOpenModal(true)}
           >
             Publicar anúncio
@@ -32,7 +35,7 @@ export function NotFoundAd() {
 
       <ModalFormAd
         open={openModal}
-        handleClose={() => setOpenModal(false)}
+        handleClose={() => {setOpenModal(false)}}
       />
     </Fragment>
   )

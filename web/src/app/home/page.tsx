@@ -1,34 +1,31 @@
 'use client'
-import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import Logo from '../../../public/assets/images/logo.png'
 import { getSubjects } from '@/service/subject'
 import { ImageCard, TSubjects } from '@/type/subject'
-import { Button, Card, CircularProgress, Typography } from '@mui/material'
+import { CircularProgress, Typography } from '@mui/material'
 import { Splide, SplideSlide } from '@splidejs/react-splide'
-import '@splidejs/react-splide/css';
+import '@splidejs/react-splide/css'
 import { useQuery } from '@tanstack/react-query'
 
 // IMAGE
-import adm from '../../../public/assets/images/subjects/Administração.png';
-import fsc from '../../../public/assets/images/subjects/Física.png';
-import mat from '../../../public/assets/images/subjects/Matemática.png';
-import lin from '../../../public/assets/images/subjects/Linguagens.png';
-import soc from '../../../public/assets/images/subjects/Sociologia.png';
-import eng from '../../../public/assets/images/subjects/Engenharia.png';
-import edf from '../../../public/assets/images/subjects/Ed. Física.png';
-import inf from '../../../public/assets/images/subjects/Informática.png';
-import geo from '../../../public/assets/images/subjects/Geografia.png';
-import bio from '../../../public/assets/images/subjects/Biologia.png';
-import qui from '../../../public/assets/images/subjects/Química.png';
-import his from '../../../public/assets/images/subjects/História.png';
+import adm from '../../../public/assets/images/subjects/Administração.png'
+import fsc from '../../../public/assets/images/subjects/Física.png'
+import mat from '../../../public/assets/images/subjects/Matemática.png'
+import lin from '../../../public/assets/images/subjects/Linguagens.png'
+import soc from '../../../public/assets/images/subjects/Sociologia.png'
+import eng from '../../../public/assets/images/subjects/Engenharia.png'
+import edf from '../../../public/assets/images/subjects/Ed. Física.png'
+import inf from '../../../public/assets/images/subjects/Informática.png'
+import geo from '../../../public/assets/images/subjects/Geografia.png'
+import bio from '../../../public/assets/images/subjects/Biologia.png'
+import qui from '../../../public/assets/images/subjects/Química.png'
+import his from '../../../public/assets/images/subjects/História.png'
 
 
 import { StaticImport } from 'next/dist/shared/lib/get-img-props'
 import useScreenSize from '@/utils/resize'
 import { useRouter } from 'next/navigation'
 import { Layout } from '@/components/layout'
-import { useAuthStore } from '@/store/auth'
 import { NotFoundAd } from '@/components/NotFoundAd/NotFoundAd'
 
 export default function Home() {
@@ -92,7 +89,7 @@ export default function Home() {
                 >
                 {subjects.map((subject, index) => (    
                   <SplideSlide key={index} id={`splide-slide${index}`}>
-                    <div className='flex flex-col justify-between py-4 w-[180px] h-[240px] bg-zinc-300 rounded-lg cursor-pointer hover:bg-zinc-200 hover:drop-shadow-lg' onClick={() => router.push(`/subject/${subject.id}`)}>
+                    <div className='flex flex-col justify-between py-4 w-[180px] h-[240px] bg-zinc-200 rounded-lg cursor-pointer hover:bg-zinc-100 hover:drop-shadow-lg' onClick={() => router.push(`/subject/${subject.id}`)}>
                       <Image alt='' src={setImageCard(subject.name as ImageCard)} width={96} height={96} className='self-center py-4'/>
                       <div className='align-bottom'>
                         <Typography variant='subtitle1' textAlign='start' justifySelf={'end'} className='text-green-500 px-2' fontWeight={'bold'}>{subject.name}</Typography>

@@ -7,12 +7,10 @@ const api: AxiosInstance = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = useAuthStore.getState().state.token;
+    const token = useAuthStore.getState().token;
     config.headers = config.headers ?? {}
 
-    const publicRoutes = ['/login', '/register', '/home', '/subjects'].includes(window.location.pathname);
-
-    if (!publicRoutes && token) {
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     } 
 

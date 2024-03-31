@@ -3,60 +3,100 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import { MouseEvent, useState } from 'react';
+import { useState } from 'react';
 import { useAuthStore } from '@/store/auth';
 import { useUserStore } from '@/store/user';
-import { Logout } from '@mui/icons-material';
 import ModalAccess from '../ModalAccess/ModalAccess';
+import { Fade, Menu, MenuItem } from '@mui/material';
+import { Home } from '@mui/icons-material';
+import { usePathname, useRouter } from 'next/navigation';
+import { useStore } from 'zustand';
 
 export default function Nav() {
-  const [openModalAccess, setOpenModalAccess] = useState(false);
-  const auth = Boolean(useAuthStore.getState().state.token)
+  const router = useRouter();
+  const pathname = usePathname()
+  const [openModalAccess, setOpenModalAccess] = useState<boolean>(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
-  const user = useUserStore.getState().state.user;
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const isIconHome = ['/', '/home'].includes(pathname)
+
+  const authStore = useStore(useAuthStore);
+  const { authenticated } = authStore;
+
+  const userStore = useStore(useUserStore);
+  const { user } = userStore;
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" color='transparent'>
-        <Toolbar>
-          <AccountCircle sx={{ color: 'rgb(63 63 70)', mr: 1 }}/>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, color: 'rgb(63 63 70)' }}
-            className='underline cursor-pointer'
-            onClick={() => {
-              if (!auth) {
-                setOpenModalAccess(true);
+      <AppBar position="static" color='transparent' sx={{ boxShadow: 0 }}>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between'}}>
+          <>
+            <Home sx={{ color: 'rgb(22 163 74)', mr: 1, visibility: !isIconHome ? 'visible' : 'hidden' }}/>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1, color: 'rgb(22 163 74)',  visibility: !isIconHome ? 'visible' : 'hidden'}}
+              onClick={() => router.push('/home')}
+            >
+              <span className='cursor-pointer'>Início</span>
+            </Typography>
+          </>
+          <div
+            style={{ display: 'flex', alignItems: 'center'}}
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={(event) => {
+              if (authenticated) {
+                handleClick(event);
               }
-              {};
             }}
           >
-            {user?.name || 'Entrar'}
-          </Typography>
-          {auth && (
-            <div>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={() => {
-                  useAuthStore.getState().actions.removeToken();
-                  useUserStore.getState().actions.removeUser();
-                  window.location.replace('/');
-                }}
-                color="inherit"
-                sx={{color: 'rgb(63 63 70)'}}
-              >
-                <Logout />
-              </IconButton>
-            </div>
-          )}
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1, color: 'rgb(22 163 74)'}}
+              className='underline'
+              onClick={() => {
+                if (!authenticated) {
+                  setOpenModalAccess(true);
+                }
+              }}
+            >
+              <span className='cursor-pointer'>{user?.name || 'Entrar'}</span>
+            </Typography>
+            <AccountCircle sx={{ color: 'rgb(22 163 74)', ml: 1 }}/>
+          </div>
         </Toolbar>
       </AppBar>
+
+      <Menu
+        id="demo-positioned-menu"
+        aria-labelledby="demo-positioned-button"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        TransitionComponent={Fade}
+      >
+        <MenuItem onClick={handleClose}>Perfil</MenuItem>
+        <MenuItem
+          onClick={() => {
+            useAuthStore.getState().removeToken();
+            useUserStore.getState().removeUser();
+            window.location.replace('/');
+          }}
+        >
+          Sair
+        </MenuItem>
+      </Menu>
 
       <ModalAccess
         open={openModalAccess}

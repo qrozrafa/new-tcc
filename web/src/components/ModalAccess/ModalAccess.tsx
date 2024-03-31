@@ -12,7 +12,7 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: 'rgb(63 63 70)',
+  bgcolor: 'rgb(241 245 249)',
   borderRadius: 4,
   boxShadow: 24,
   p: 4,
@@ -45,15 +45,15 @@ export default function ModalAccess({ open, handleClose }: TModalAccess) {
                 setTab(newValue);
               }}
               sx={{ 
-                bgcolor: 'rgb(63 63 70)',
+                bgcolor: 'rgb(241 245 249)',
                 '& .Mui-selected': {
                   color: 'rgb(34 197 94)'
                 },
                 '& .MuiBottomNavigationAction-root': {
-                  color: 'rgb(255 255 255)'
+                  color: 'rgb(107 114 128)'
                 },
                 '& .MuiSvgIcon-root': {
-                  color: 'rgb(255 255 255)'
+                  color: 'rgb(107 114 128)'
                 },
                 '& .MuiSvgIcon-selected': {
                   color: 'rgb(34 197 94)'

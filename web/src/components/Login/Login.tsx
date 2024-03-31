@@ -28,8 +28,8 @@ export default function Login({ onLogin }: TLogin) {
     showPassword: z.boolean().default(false),
   });
 
-  const { actions: { setToken }, state: { token } } = useAuthStore();
-  const { actions: { setUser }, state: { user } } = useUserStore();
+  const useAuth = useAuthStore();
+  const useUser = useUserStore();
   const { watch, formState: { errors }, clearErrors, setValue, setError } = useForm();
 
 
@@ -44,8 +44,8 @@ export default function Login({ onLogin }: TLogin) {
     const response = await login(data);
 
     if(response) {
-    setToken(response?.access_token);
-    setUser(response.user);
+    useAuth.setToken(response?.access_token);
+    useUser.setUser(response.user);
     onLogin();
     } else {
     setError('email', { message: 'Email ou senha inválidos' });
@@ -99,13 +99,7 @@ export default function Login({ onLogin }: TLogin) {
         size="small"
         autoFocus
         helperText={!!errors.email?.message}
-        sx={{
-          input: {color: 'white'},
-          label: {color: 'white'},
-          "& label.Mui-focused": {
-            color: 'white',
-          },
-        }}
+       
       />
       <TextField
         id="outlined-size-small" 
@@ -138,13 +132,7 @@ export default function Login({ onLogin }: TLogin) {
           )
         }}
         helperText={!!errors.email?.message}
-        sx={{
-          input: {color: 'white'},
-          label: {color: 'white'},
-          "& label.Mui-focused": {
-            color: 'white',
-          },
-        }}
+       
       />
     <div className='flex flex-col gap-4 justify-center'>
       <Button 

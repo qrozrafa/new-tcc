@@ -1,10 +1,7 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-export type UserState = {
-  user: DataUser | undefined;
-}
-
-export type DataUser = {
+export type UserData = {
   id:        string;
   name:      string;
   email:     string;
@@ -17,22 +14,15 @@ export type DataUser = {
   status:    string;
 }
 
-export type UserActions = {
-  setUser: (user: UserState) => void;
+export type UserStoreProps = {
+  user: UserData | undefined;
+  setUser: (user: UserData) => void;
   removeUser: () => void
 }
 
-export type User = {
-  state: UserState;
-  actions: UserActions;
-}
+export const useUserStore = create(persist<UserStoreProps>((set, get) => ({
+  user: undefined,
+  setUser: (user: UserData) => set(() => ({...get(), user})),
+  removeUser: () => set(() => ({...get(), user: undefined})),
+}), {name: 'user-store'}));
 
-export const useUserStore = create<User>((set) => ({
-  state: {
-    user: undefined
-  },
-  actions: {
-    setUser: (user: UserState) => set((state: any) => ({ state: { ...state.state, user } })),
-    removeUser: () => set({ state: { user: undefined } }),
-  }
-}));

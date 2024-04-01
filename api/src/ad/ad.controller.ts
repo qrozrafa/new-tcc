@@ -38,6 +38,11 @@ export class AdController {
     return this.adService.getAdById(id);
   }
 
+  @Get('/user/:id')
+  async getAdsByUserId(@Param() userId: string) {
+    return this.adService.getAdsByUserId(userId);
+  }
+
   @Delete(':id')
   async deleteAd(@Param() id: string, @Body() body: DeleteAdDto) {
     return this.adService.deleteAd(id, body);

@@ -12,6 +12,8 @@ import { Fade, Menu, MenuItem } from '@mui/material';
 import { Home } from '@mui/icons-material';
 import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from 'zustand';
+import Image from 'next/image';
+import Logo from '../../../public/assets/images/logo.png';
 
 export default function Nav() {
   const router = useRouter();
@@ -40,15 +42,7 @@ export default function Nav() {
       <AppBar position="static" color='transparent' sx={{ boxShadow: 0 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between'}}>
           <>
-            <Home sx={{ color: 'rgb(22 163 74)', mr: 1, visibility: !isIconHome ? 'visible' : 'hidden' }}/>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, color: 'rgb(22 163 74)',  visibility: !isIconHome ? 'visible' : 'hidden'}}
-              onClick={() => router.push('/home')}
-            >
-              <span className='cursor-pointer'>Início</span>
-            </Typography>
+            <Image src={Logo} alt='logo duo study' onClick={() => router.push('/home')} className='cursor-pointer' width={80} height={80}/>
           </>
           <div
             style={{ display: 'flex', alignItems: 'center'}}
@@ -86,12 +80,12 @@ export default function Nav() {
         onClose={handleClose}
         TransitionComponent={Fade}
       >
-        <MenuItem onClick={handleClose}>Perfil</MenuItem>
+        <MenuItem onClick={() => router.push('/profile')}>Perfil</MenuItem>
         <MenuItem
           onClick={() => {
             useAuthStore.getState().removeToken();
             useUserStore.getState().removeUser();
-            window.location.replace('/');
+            router.push('/');
           }}
         >
           Sair

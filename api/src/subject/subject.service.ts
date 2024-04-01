@@ -39,7 +39,7 @@ export class SubjectService {
     }
   }
 
-  async listSubjectAdsForUser(subjectId: string) {
+  async listSubjectAds(subjectId: string) {
     const subjectAds = await this.userAdService.getSubjectAds(subjectId);
 
     if (subjectAds) {

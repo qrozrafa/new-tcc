@@ -38,8 +38,8 @@ export class SubjectController {
     return this.subjectService.getSubjectById(id);
   }
   @Get('ads/:id')
-  async getSubjectAdForUser(@Param('id', ParseUUIDPipe) id: string) {
-    return this.subjectService.listSubjectAdsForUser(id);
+  async getSubjectAds(@Param('id', ParseUUIDPipe) id: string) {
+    return this.subjectService.listSubjectAds(id);
   }
 
   @UseGuards(AuthGuard, RoleGuard)

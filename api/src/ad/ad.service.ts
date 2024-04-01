@@ -81,6 +81,26 @@ export class AdService {
     });
   }
 
+  async getAdsByUserId(userId: any) {
+    const ads = await this.prismaService.ad.findMany({
+      where: {
+        status: 'ACTIVE',
+      },
+    });
+    const userAd = await this.prismaService.userAd.findMany({
+      where: {
+        userId: userId.id,
+      },
+    });
+
+    const listUserAds = userAd.map((ad) => {
+      const userAds = ads.find((userAd) => userAd.id === ad.adId);
+      return userAds;
+    });
+
+    return listUserAds;
+  }
+
   async deleteAd(id: string, body: DeleteAdDto) {
     await this.exists(id);
 

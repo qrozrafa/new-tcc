@@ -11,6 +11,7 @@ export class CheckUserIdAndRoleMiddleware implements NestMiddleware {
     const userIdFromToken = this.extractUserIdFromToken(authorizationHeader);
 
     const userIdToUpdate = req.params.id;
+    console.log(req.params);
     const userRoleFromToken =
       this.extractUserRoleFromToken(authorizationHeader);
 
@@ -23,6 +24,9 @@ export class CheckUserIdAndRoleMiddleware implements NestMiddleware {
     if (userRoleFromToken === 'ADMIN') {
       return next();
     }
+
+    console.log(userIdToUpdate);
+    console.log(userIdFromToken);
 
     if (userIdFromToken !== userIdToUpdate) {
       return res

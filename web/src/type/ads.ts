@@ -15,6 +15,8 @@ export type TAd = {
 export type DetailAd = {
   id:        string;
   name:      string;
+  userId:    string;
+  subjectId: string;
   weekDay:   string[];
   hourStart: Date;
   hourEnd:   Date;

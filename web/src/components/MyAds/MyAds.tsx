@@ -2,17 +2,24 @@ import { getAdsByUser } from "@/service/profile";
 import { useAuthStore } from "@/store/auth";
 import { useUserStore } from "@/store/user";
 import { Divisor } from "@/styles/styles";
-import { DetailAd, TAd } from "@/type/ads";
+import { DetailAd } from "@/type/ads";
 import { weekDays } from "@/utils/constants";
-import { Delete, Edit, Mic, Task, VideoCameraFront } from "@mui/icons-material";
-import { Button, CircularProgress, Tooltip, Typography } from "@mui/material";
+import { Delete, Edit, Mic, VideoCameraFront } from "@mui/icons-material";
+import { CircularProgress, IconButton, Tooltip, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useStore } from "zustand";
+import DeleteAd from "../DeleteAd/DeleteAd";
+import { useState } from "react";
+import { weekDaysSelected } from "@/utils/utils";
+import ModalFormAd from "../ModalFormAd/ModalFormAd";
 
 export default function MyAds() {
   const useAuth = useStore(useAuthStore);
   const useUser = useStore(useUserStore);
+  const [openModalDeleteAd, setOpenModalDeleteAd] = useState<boolean>(false);
+  const [openModalEditAd, setOpenModalEditAd] = useState<boolean>(false);
+  const [adSelected, setAdSelected] = useState<DetailAd>();
   const { user } = useUser;
   const { authenticated } = useAuth;
 
@@ -26,16 +33,14 @@ export default function MyAds() {
     staleTime: 0,
   });
 
-  function weekDaysSelected(days: string[]): string {
-    const daysSeletected = days.map(day => `${weekDays[day]}`);
-    let daysFormated: string;
+  async function handleDeleteAd(ad: DetailAd) {
+    await setAdSelected(ad);
+    setOpenModalDeleteAd(true);
+  }
 
-    if (daysSeletected.length === 1) {
-      daysFormated = daysSeletected[0];
-    } else {
-      daysFormated = daysSeletected.slice(0, -1).join(', ') + ' e ' + daysSeletected[daysSeletected.length - 1];
-    }
-   return daysFormated;
+  async function handleEditAd(ad: DetailAd) {
+    await setAdSelected(ad);
+    setOpenModalEditAd(true);
   }
 
 
@@ -54,9 +59,9 @@ export default function MyAds() {
               <>
                 <div className="flex justify-between">
                   <div className={`flex flex-col gap-1`}>
-                    <Typography variant='body1'className='font-bold text-green-500'><b>{ad.name}</b></Typography>
-                    <Typography variant='body1'className="text-zinc-700">Dias: <b>{weekDaysSelected(ad.weekDay)}</b></Typography>
-                    <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad.hourStart, 'HH:mm')} - {format(ad.hourEnd, 'HH:mm')}</b></Typography>
+                    <Typography variant='body1'className='font-bold text-green-500'><b>{ad?.name}</b></Typography>
+                    <Typography variant='body1'className="text-zinc-700">Dias: <b>{weekDaysSelected(ad?.weekDay)}</b></Typography>
+                    <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad?.hourStart, 'HH:mm')} - {format(ad?.hourEnd, 'HH:mm')}</b></Typography>
                     <div className="flex gap-1">  
                       <Tooltip title={ad.useVoice ? "Microfone disponível" : "Microfone indisponível"}>
                         <Mic className={`${ad.useVoice ? 'text-green-500' : 'text-gray-700'}`} />
@@ -68,10 +73,14 @@ export default function MyAds() {
                   </div>
                   <div className={`flex gap-2 self-start`}>
                     <Tooltip title="Editar anúncio">
-                      <Edit color="success"/>
+                      <IconButton color="success" onClick={() => handleEditAd(ad)}>
+                        <Edit color="success"/>
+                      </IconButton>
                     </Tooltip>
-                    <Tooltip title="Excluir anúncio">
-                      <Delete color="error"/>
+                    <Tooltip title="Excluir anúncio" onClick={() => handleDeleteAd(ad)}>
+                      <IconButton color="error" >
+                        <Delete color="error"/>
+                      </IconButton>
                     </Tooltip>
                   </div>
                 </div>
@@ -82,6 +91,18 @@ export default function MyAds() {
         )}
         </>
       )}
+
+      <DeleteAd
+        open={openModalDeleteAd}
+        handleClose={() => {setOpenModalDeleteAd(false)}}
+        ad={adSelected}
+      />
+
+      <ModalFormAd
+        open={openModalEditAd}
+        ad={adSelected}
+        handleClose={() => {setOpenModalEditAd(false)}}
+      />
     </>
   )
 }

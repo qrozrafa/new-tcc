@@ -31,6 +31,6 @@ export class UserModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(CheckUserIdAndRoleMiddleware)
-      .forRoutes('users/:id', 'users/restore/:id');
+      .forRoutes('users/:id', 'users/restore/:id', 'users/reset-password/:id');
   }
 }

@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { useContext, useEffect, useState } from 'react';
 import { Button, FormControlLabel, FormGroup, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
-import { TOptions } from '@/type/ads';
+import { DetailAd, TOptions } from '@/type/ads';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TSubjects } from '@/type/subject';
 import { InputTime } from '../inputs/InputTime';
@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useUserStore } from '@/store/user';
-import { createAd } from '@/service/formAd';
+import { createAd, updateAd } from '@/service/formAd';
 import { set } from 'date-fns';
 import { SnackbarContext } from '@/context/snackbar.context';
 
@@ -29,17 +29,17 @@ const style = {
 
 type TModalForm = {
   open: boolean;
+  ad?: DetailAd;
   handleClose: () => void;
 }
 
-export default function ModalFormAd({ open, handleClose }: TModalForm) {
+export default function ModalFormAd({ open, ad, handleClose }: TModalForm) {
   const queryClient = useQueryClient();
   const useUser = useUserStore();
   const snackbarContext = useContext(SnackbarContext);
   
   const [selectSubjects, setSelectSubjects] = useState<TOptions[]>([{label: 'Selecione a disciplina que deseja', value: ''}]);
   const [alignment, setAlignment] = useState<string[]>([]);
-  const [stateSnackBar, setStateSnackBar] = useState({state: false, msg: ''});
 
   const subjects: TSubjects[] | undefined = queryClient.getQueryData(['subjects']);
 
@@ -62,6 +62,15 @@ export default function ModalFormAd({ open, handleClose }: TModalForm) {
   type createFormAd = z.infer<typeof formAd>
 
   const { register, watch, formState: { errors }, clearErrors, setValue, handleSubmit, setError } = useForm<createFormAd>({
+    defaultValues: {
+      subjects: ad?.subjectId || '',
+      name: ad?.name || '',
+      hourStart: ad?.hourStart ? new Date(ad?.hourStart).toLocaleTimeString() : '' || '',
+      hourEnd: ad?.hourEnd ? new Date(ad?.hourEnd).toLocaleTimeString() : '' || '',
+      linkCall: ad?.linkCall || '',
+      useVoice: ad?.useVoice || true,
+      useVideo: ad?.useVideo || true,
+    },
     resolver: zodResolver(formAd),
   });
 
@@ -111,11 +120,15 @@ export default function ModalFormAd({ open, handleClose }: TModalForm) {
         linkCall: watch('linkCall'),
       }
 
-      snackbarContext.success('Anúncio criado com sucesso!');
+      if (ad?.id) {
+        return await updateAd(ad.id, data);
+      } else {
+        return await createAd(data);
+      }
 
-      return await createAd(data);
     },
     onSuccess: async () => {
+      await snackbarContext.success('Anúncio criado com sucesso!');
       await handleRefresh();
       handleClose();
     },
@@ -123,6 +136,8 @@ export default function ModalFormAd({ open, handleClose }: TModalForm) {
       setError('root', { message: data.message});
     }
   })
+
+  console.log(ad)
 
   async function handleRefresh() {
     await queryClient.refetchQueries({ queryKey: ['subjects'] });
@@ -141,7 +156,7 @@ export default function ModalFormAd({ open, handleClose }: TModalForm) {
         <>
           <Box sx={style}>
             <Typography id="modal-modal-title" variant="h6" component="h2" className='text-green-500 mb-3'>
-              Publique um anúncio
+              {ad?.id ? 'Atualizar anúncio' : 'Publique um anúncio'}
             </Typography>
             <div style={{display: 'flex', flexDirection: 'column', gap: 16, margin: `32px 0 0`}}>
               <TextField
@@ -230,10 +245,9 @@ export default function ModalFormAd({ open, handleClose }: TModalForm) {
 
               <div style={{display: 'flex', gap: 16, alignContent: 'center', marginBottom: 32, justifyContent: 'flex-end' }}>
                 <Button variant="outlined" color="success" onClick={handleClose}>Cancelar</Button>
-                <Button variant="contained" color="success" onClick={() => submitFormAd()} disabled={isLoading}>Publicar</Button>
+                <Button variant="contained" color="success" onClick={() => submitFormAd()} disabled={isLoading} className='bg-green-500'>Publicar</Button>
               </div>           
             </div>
-            <button onClick={() =>  snackbarContext.success('Anúncio criado com sucesso!')}>snackbar</button>
           </Box>
         </>
       </Modal>

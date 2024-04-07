@@ -1,5 +1,5 @@
 import api from "@/middleware/api";
-import { DataRegisterUser } from "@/type/register";
+import { DataEditUser, DataRegisterUser } from "@/type/register";
 
 export async function getDataUserToken() {
   try {
@@ -16,5 +16,13 @@ export async function createUser(data: DataRegisterUser) {
     return response.data;
   } catch (error) {
     console.error('Erro durante o cadastro:', error);
+  }
+}
+export async function editDataUser(id?: string, data?: DataEditUser) {
+  try {
+    const response = await api.patch(`/users/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Erro durante a edição do perfil:', error);
   }
 }

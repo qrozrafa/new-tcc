@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UserAdService } from 'src/user-ad/user-ad.service';
-import { DeleteAdDto } from './dto/delete-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 
 @Injectable()
@@ -49,11 +48,22 @@ export class AdService {
   }
 
   async listAdsActive() {
-    return await this.prismaService.ad.findMany({
+    const userAd = await this.prismaService.userAd.findMany({
       where: {
         status: 'ACTIVE',
       },
     });
+
+    const ad = await this.prismaService.ad.findMany({
+      where: {
+        status: 'ACTIVE',
+      },
+    });
+
+    return {
+      ad,
+      ...userAd,
+    };
   }
 
   async listAdsInactive() {
@@ -90,24 +100,29 @@ export class AdService {
     const userAd = await this.prismaService.userAd.findMany({
       where: {
         userId: userId.id,
+        status: 'ACTIVE',
       },
     });
 
     const listUserAds = userAd.map((ad) => {
       const userAds = ads.find((userAd) => userAd.id === ad.adId);
-      return userAds;
+      return { ...ad, ...userAds };
     });
 
     return listUserAds;
   }
 
-  async deleteAd(id: string, body: DeleteAdDto) {
-    await this.exists(id);
+  async deleteAd(id: any) {
+    const userAd = await this.prismaService.userAd.findFirst({
+      where: {
+        adId: id.id,
+      },
+    });
 
     const editedAd = await this.prismaService.$transaction(async (prisma) => {
       const ad = await prisma.ad.update({
         where: {
-          id,
+          id: id.id,
         },
         data: {
           deletedAt: new Date(),
@@ -115,7 +130,7 @@ export class AdService {
         },
       });
 
-      await this.userAdService.inactivateUserAd(body.subjectId, prisma);
+      await this.userAdService.inactivateUserAd(userAd.adId, prisma);
       return ad;
     });
 

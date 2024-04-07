@@ -6,7 +6,7 @@ export const Container = tw.div`
   mx-auto
   w-full
   h-full
-  mt-16
+  mt-8
   justify-center
   items-center
   gap-16

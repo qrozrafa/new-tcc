@@ -1,26 +1,19 @@
 'use client'
 import { useForm } from "react-hook-form"
-import { useAuthStore } from "@/store/auth"
-import { Alert, Button, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
+import { Alert, Button, TextField } from '@mui/material'
 import { z } from 'zod'
-import { Visibility, VisibilityOff } from "@mui/icons-material"
-import { useRouter } from "next/navigation"
-import { createUser, getDataUserToken } from "@/service/user"
+import { editDataUser } from "@/service/user"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useUserStore } from "@/store/user"
 import { useMutation } from "@tanstack/react-query"
-import { login } from "@/service/login"
 
-type TRegister =  {
-  onRegister: () => void;
-}
+export default function EditProfile() {
 
-export default function Register({ onRegister }: TRegister) {
-  const router = useRouter();
-  const useAuth = useAuthStore();
   const useUser = useUserStore();
 
-  const registerAccount = z.object({
+  const { user } = useUser;
+
+  const editData = z.object({
     name: z.string().min(4, 'Insira o seu nome'),
     email: z.string().email('Insira um endereço de e-mail válido'),
     password: z
@@ -33,12 +26,21 @@ export default function Register({ onRegister }: TRegister) {
     showPassword: z.boolean().default(false),
     cpf: z.string().min(11, 'Insira o seu CPF'),
     ra: z.string().min(6, 'Insira o seu RA'),
+    role: z.string().default('USER').optional(),
   });
 
-  type createUserFormData = z.infer<typeof registerAccount>
+  type createUserFormData = z.infer<typeof editData>
 
   const { register, watch, formState: { errors }, clearErrors, setValue, handleSubmit, setError } = useForm<createUserFormData>({
-    resolver: zodResolver(registerAccount),
+    defaultValues: {
+      name: user?.name,
+      email: user?.email,
+      showPassword: false,
+      cpf: user?.cpf,
+      ra: user?.ra,
+      role: user?.role,
+    },
+    resolver: zodResolver(editData),
   });
 
   const { mutate: handleRegister, isPending: isLoading } = useMutation({
@@ -46,35 +48,17 @@ export default function Register({ onRegister }: TRegister) {
       const data = {
         name: watch('name'),
         email: watch('email'),
-        password: watch('password'),
         cpf: watch('cpf'),
         ra: watch('ra'),
-        role: 'USER'
+        role: watch('role'),
       }
       
-      const response = await createUser(data);
+      const response = await editDataUser(user?.id, data);
 
       if(response) {
-        useAuth.setToken(response?.access_token)
+        useUser.setUser(response)
       }
     },
-    onSuccess: async () => {
-      const data = {
-        email: watch('email'),
-        password: watch('password')
-      };
-  
-      const response = await login(data);
-  
-      if(response) {
-      useAuth.setToken(response?.access_token);
-      useUser.setUser(response.user);
-      onRegister();
-      } 
-    },
-    onError: (data) => {
-      setError('root', { message: data.message});
-    }
   })
 
   const handleClickShowPassword = () => {
@@ -86,8 +70,7 @@ export default function Register({ onRegister }: TRegister) {
   };
 
   return (
-    <div className="w-full flex flex-col justify-center gap-4">
-      <Typography variant="h5" align="center" className="text-green-500" fontWeight={700}>CRIAÇÃO DE CONTA</Typography>
+    <div className="w-[400px] flex flex-col justify-center gap-4 mx-auto">
       {Object.keys(errors).length > 0 && (
         Object.values(errors).map((item, index) => (
           <Alert severity="error">{item.message}</Alert>
@@ -160,36 +143,7 @@ export default function Register({ onRegister }: TRegister) {
         required
         inputProps={{ maxLength: 6 }}
       />
-      <TextField
-        variant="standard"
-        label="Senha:"
-        placeholder="Digite sua senha"
-        type={watch('showPassword') ? 'text' : 'password'}
-        color="success"
-        {...register('password')}
-        onChange={
-          () => {
-            clearErrors('password')
-          }
-        }
-        error={!!errors.password}
-        size="small"
-        required
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility:"
-                onClick={handleClickShowPassword}
-                onMouseDown={handleMouseDownPassword}
-                edge="end"
-              >
-                {watch('showPassword') ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          )
-        }}
-      />
+
       <div className='flex flex-col gap-4 justify-center'>
         <Button 
           variant="contained"
@@ -201,7 +155,7 @@ export default function Register({ onRegister }: TRegister) {
           className="bg-green-600"
           disabled={isLoading}
         >
-          Criar conta
+          Salvar
         </Button>
       </div>
     </div>

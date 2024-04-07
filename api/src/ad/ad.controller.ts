@@ -44,8 +44,8 @@ export class AdController {
   }
 
   @Delete(':id')
-  async deleteAd(@Param() id: string, @Body() body: DeleteAdDto) {
-    return this.adService.deleteAd(id, body);
+  async deleteAd(@Param() id: string) {
+    return this.adService.deleteAd(id);
   }
 
   @Patch('/restore/:id')

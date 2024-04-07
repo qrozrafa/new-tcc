@@ -76,7 +76,31 @@ export class UserService {
 
   async updatePartialUser(id: string, data: UpdatePatchUserDto) {
     await this.exists(id);
-    data.password = await bcrypy.hash(data.password, await bcrypy.genSalt());
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: id },
+    });
+
+    if (data.password && data.newPassword) {
+      const passwordMatch = await bcrypy.compare(data.password, user.password);
+
+      if (!passwordMatch) {
+        throw new Error('Senha atual incorreta');
+      }
+
+      const hashedNewPassword = await bcrypy.hash(
+        data.newPassword,
+        await bcrypy.genSalt(),
+      );
+
+      await this.prisma.user.update({
+        where: { id: id },
+        data: { password: hashedNewPassword },
+      });
+
+      return { msg: 'Senha atualizada com sucesso' };
+    }
+
     return await this.prisma.user.update({
       where: {
         id,

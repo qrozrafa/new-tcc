@@ -6,7 +6,7 @@ import { TAd } from "@/type/ads";
 import { TSubjects } from "@/type/subject";
 import { weekDays } from "@/utils/constants";
 import { Mic, Search, VideoCameraFront } from "@mui/icons-material";
-import { Button, CircularProgress, TextField, Typography } from "@mui/material";
+import { Button, CircularProgress, TextField, Tooltip, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from 'date-fns';
@@ -100,8 +100,12 @@ export default function Subject() {
                       <Typography variant='body1'className="text-zinc-700">Dias: <b>{weekDaysSelected(ad.detailAd.weekDay)}</b></Typography>
                       <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad.detailAd.hourStart, 'HH:mm')} - {format(ad.detailAd.hourEnd, 'HH:mm')}</b></Typography>
                       <div className="flex gap-1">
-                        <Mic className={`${ad.detailAd.useVoice ? 'text-green-500' : 'text-gray-700'}`} />
+                      <Tooltip title={ad.detailAd.useVoice ? "Microfone disponível" : "Microfone indisponível"}>
+                        <Mic className={`${ad.detailAd.useVoice ? 'text-green-500' : 'text-gray-300'}`} />
+                      </Tooltip>
+                      <Tooltip title={ad.detailAd.useVideo ? "Video disponível" : "Video indisponível"}>
                         <VideoCameraFront className={`${ad.detailAd.useVideo ? 'text-green-500' : 'text-gray-300'}`} />
+                      </Tooltip>
                       </div>
                     </div>
                     <div className={`self-end`}>
@@ -110,6 +114,7 @@ export default function Subject() {
                         color='success'
                         size='small'
                         disabled={!authenticated}
+                        className="bg-green-500"
                       >
                         Conectar
                       </Button>

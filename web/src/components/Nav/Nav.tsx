@@ -9,7 +9,6 @@ import { useAuthStore } from '@/store/auth';
 import { useUserStore } from '@/store/user';
 import ModalAccess from '../ModalAccess/ModalAccess';
 import { Fade, Menu, MenuItem } from '@mui/material';
-import { Home } from '@mui/icons-material';
 import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from 'zustand';
 import Image from 'next/image';
@@ -29,7 +28,6 @@ export default function Nav() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const isIconHome = ['/', '/home'].includes(pathname)
 
   const authStore = useStore(useAuthStore);
   const { authenticated } = authStore;
@@ -65,7 +63,7 @@ export default function Nav() {
                 }
               }}
             >
-              <span className='cursor-pointer'>{user?.name || 'Entrar'}</span>
+              <span className='cursor-pointer'>{user?.name ?? 'Entrar'}</span>
             </Typography>
             <AccountCircle sx={{ color: 'rgb(22 163 74)', ml: 1 }}/>
           </div>

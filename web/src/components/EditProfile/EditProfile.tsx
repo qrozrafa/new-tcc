@@ -6,9 +6,11 @@ import { editDataUser } from "@/service/user"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useUserStore } from "@/store/user"
 import { useMutation } from "@tanstack/react-query"
+import { useContext } from "react"
+import { SnackbarContext } from "@/context/snackbar.context"
 
 export default function EditProfile() {
-
+  const snackbarContext = useContext(SnackbarContext);
   const useUser = useUserStore();
 
   const { user } = useUser;
@@ -59,18 +61,17 @@ export default function EditProfile() {
         useUser.setUser(response)
       }
     },
+    onSuccess: () => {
+      snackbarContext.success('Perfil editados com sucesso!');
+    },
+    onError: () => {
+      snackbarContext.error('Erro ao editar perfil');
+    }
   })
 
-  const handleClickShowPassword = () => {
-    setValue('showPassword', !watch('showPassword'));
-  };
-
-  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
 
   return (
-    <div className="w-[400px] flex flex-col justify-center gap-4 mx-auto">
+    <div className="w-[300px] flex flex-col justify-center gap-4 mx-auto">
       {Object.keys(errors).length > 0 && (
         Object.values(errors).map((item, index) => (
           <Alert severity="error">{item.message}</Alert>

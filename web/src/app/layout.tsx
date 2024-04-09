@@ -8,6 +8,7 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { ReactQueryClientProvider } from '@/service/ReactQueryClientProvider';
 import ParentProvider from './ParentWrapper';
+import Snackbar from '@/components/SnackBar/SnackBar';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,13 +24,14 @@ export default function RootLayout({
 }) {
   return (
     <ReactQueryClientProvider>
-      <html lang="en">
-        <body className={inter.className}>
-          <ParentProvider>
+      <ParentProvider>
+        <html lang="en">
+          <body className={inter.className}>
             {children}
-          </ParentProvider>
-        </body>
-      </html>
+            <Snackbar />
+          </body>
+        </html>
+      </ParentProvider>
     </ReactQueryClientProvider>
   )
 }

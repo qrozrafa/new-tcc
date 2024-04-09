@@ -14,6 +14,7 @@ export const SnackbarContext = createContext({
 });
 
 export default function SnackbarProvider(props: any) {
+  console.log('SnackbarProvider entreeeei aqui ');
   const [msg, setMsg] = useState<SnackMsgDto | null>(null);
 
   function success(message: string, duration = 3000): void {

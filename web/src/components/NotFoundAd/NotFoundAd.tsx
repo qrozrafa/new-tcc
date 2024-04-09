@@ -4,8 +4,9 @@ import { Button, Typography } from "@mui/material";
 import { Fragment, useState } from "react";
 import ModalFormAd from "../ModalFormAd/ModalFormAd";
 import { useStore } from "zustand";
+import { TSubjects } from "@/type/subject";
 
-export function NotFoundAd() {
+export function NotFoundAd({subjects: TSubjects}: {subjects: TSubjects[]}) {
   const isMobile = useScreenSize(688);
   const [openModal, setOpenModal] = useState(false);
   const authStore = useStore(useAuthStore);
@@ -36,6 +37,7 @@ export function NotFoundAd() {
       <ModalFormAd
         open={openModal}
         handleClose={() => {setOpenModal(false)}}
+        subjects={TSubjects}
       />
     </Fragment>
   )

@@ -13,6 +13,8 @@ import DeleteAd from "../DeleteAd/DeleteAd";
 import { useState } from "react";
 import { weekDaysSelected } from "@/utils/utils";
 import ModalFormAd from "../ModalFormAd/ModalFormAd";
+import { getSubjects } from "@/service/subject";
+import { TSubjects } from "@/type/subject";
 
 export default function MyAds() {
   const useAuth = useStore(useAuthStore);
@@ -22,6 +24,13 @@ export default function MyAds() {
   const [adSelected, setAdSelected] = useState<DetailAd>();
   const { user } = useUser;
   const { authenticated } = useAuth;
+
+  const { data: subjects, isFetching: loadingSubjects } = useQuery<TSubjects[]>({
+    queryKey: ['subjects', 'profile'],
+    queryFn: async () => {
+      return await getSubjects()
+    },
+  });
 
 
   const {data: dataSubjectAds, isFetching: loadingSubjectAds } = useQuery<DetailAd[]>({
@@ -64,7 +73,7 @@ export default function MyAds() {
                     <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad?.hourStart, 'HH:mm')} - {format(ad?.hourEnd, 'HH:mm')}</b></Typography>
                     <div className="flex gap-1">  
                       <Tooltip title={ad.useVoice ? "Microfone disponível" : "Microfone indisponível"}>
-                        <Mic className={`${ad.useVoice ? 'text-green-500' : 'text-gray-700'}`} />
+                        <Mic className={`${ad.useVoice ? 'text-green-500' : 'text-gray-300'}`} />
                       </Tooltip>
                       <Tooltip title={ad.useVideo ? "Video disponível" : "Video indisponível"}>
                         <VideoCameraFront className={`${ad.useVideo ? 'text-green-500' : 'text-gray-300'}`} />
@@ -102,6 +111,7 @@ export default function MyAds() {
         open={openModalEditAd}
         ad={adSelected}
         handleClose={() => {setOpenModalEditAd(false)}}
+        subjects={subjects as TSubjects[]}
       />
     </>
   )

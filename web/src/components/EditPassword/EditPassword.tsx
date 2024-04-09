@@ -73,7 +73,7 @@ export default function EditPassword() {
   };
 
   return (
-    <div className="w-[400px] flex flex-col justify-center gap-4 mx-auto">
+    <div className="w-[300px] flex flex-col justify-center gap-4 mx-auto">
       {Object.keys(errors).length > 0 && (
         Object.values(errors).map((item, index) => (
           <Alert severity="error">{item.message}</Alert>

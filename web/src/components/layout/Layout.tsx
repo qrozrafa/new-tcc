@@ -1,3 +1,4 @@
+'use client'
 import * as S from './styles';
 import Nav from '../Nav/Nav';
 import { Fragment } from 'react';

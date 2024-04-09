@@ -8,6 +8,7 @@ import {
   Body,
   Param,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { AdService } from './ad.service';
 import { CreateAdDto } from './dto/create-ad.dto';
@@ -54,7 +55,7 @@ export class AdController {
   }
 
   @Put(':id')
-  async updateAd(id: string, data: CreateAdDto) {
+  async updateAd(@Param() id: ParseUUIDPipe, @Body() data: CreateAdDto) {
     return this.adService.updateAd(id, data);
   }
 }

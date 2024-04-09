@@ -10,8 +10,6 @@ import { useState } from "react";
 export default function ProfilePage() {
   const [tab, setTab] = useState(0);
 
-  console.log(tab); 
-
   return (
     <Layout>
       <div className='flex flex-col gap-4 justify-center p-8 w-full max-w-3xl'>
@@ -32,7 +30,7 @@ export default function ProfilePage() {
                 setTab(newValue);
               }}
               sx={{
-                width: 350,
+                width: 308,
                 borderRadius: 4,
                 margin: 'auto',
                 bgcolor: 'rgb(241 245 249)',

@@ -8,8 +8,6 @@ export default function Snackbar() {
   const [show, setShow] = useState<boolean>(false);
   const [msg, setMsg] = useState<SnackMsgDto | null>(null);
 
-  console.log(snackbarContext);
-
   useEffect(() => {
     if (!snackbarContext.msg) return;
 
@@ -24,6 +22,7 @@ export default function Snackbar() {
       autoHideDuration={msg?.duration || 3000}
       onClose={() => setShow(false)}
       message={msg?.message}
+      className='drop-shadow-2xl'
     >
       <Alert severity={msg?.color || 'success'}>{msg?.message}</Alert>
     </Snack>

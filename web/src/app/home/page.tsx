@@ -70,7 +70,7 @@ export default function Home() {
           {subjects && subjects.length > 0 && (
             <>
               <Typography variant='h2' className='text-zinc-700 text-center font-bold'>Encontre seu <span className='text-red-600 font-bold'>colega</span> de <span className='text-green-500 font-bold'>estudo</span></Typography>
-              <div className='w-full'>
+              <div className='max-w-7xl w-auto'>
                 <Splide  
                   options={{
                     width: window.innerWidth - 85,
@@ -100,7 +100,9 @@ export default function Home() {
                 ))}
                 </Splide>
               </div>
-              <NotFoundAd />
+              <NotFoundAd
+                subjects={subjects}
+              />
             </>
           )}
         </div>

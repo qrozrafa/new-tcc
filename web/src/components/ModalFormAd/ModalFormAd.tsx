@@ -3,7 +3,7 @@ import Modal from '@mui/material/Modal';
 import { useContext, useEffect, useState } from 'react';
 import { Button, FormControlLabel, FormGroup, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { DetailAd, TOptions } from '@/type/ads';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TSubjects } from '@/type/subject';
 import { InputTime } from '../inputs/InputTime';
 import { z } from 'zod';
@@ -11,8 +11,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useUserStore } from '@/store/user';
 import { createAd, updateAd } from '@/service/formAd';
-import { set } from 'date-fns';
+import { format, set } from 'date-fns';
 import { SnackbarContext } from '@/context/snackbar.context';
+import { getSubjects } from '@/service/subject';
+import Subject from '@/app/subject/[id]/page';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -30,24 +32,17 @@ const style = {
 type TModalForm = {
   open: boolean;
   ad?: DetailAd;
+  subjects: TSubjects[];
   handleClose: () => void;
 }
 
-export default function ModalFormAd({ open, ad, handleClose }: TModalForm) {
+export default function ModalFormAd({ open, ad, subjects, handleClose }: TModalForm) {
   const queryClient = useQueryClient();
   const useUser = useUserStore();
   const snackbarContext = useContext(SnackbarContext);
   
   const [selectSubjects, setSelectSubjects] = useState<TOptions[]>([{label: 'Selecione a disciplina que deseja', value: ''}]);
   const [alignment, setAlignment] = useState<string[]>([]);
-
-  const subjects: TSubjects[] | undefined = queryClient.getQueryData(['subjects']);
-
-  useEffect(() => {
-    if (subjects && subjects?.length !== 0) {
-      setSelectSubjects(subjects.map(subject => ({ value: subject.id, label: subject.name })));
-    }
-  }, [subjects]);
 
   const formAd = z.object({
     subjects: z.string().nonempty('Selecione a(s) disciplina(s)'),
@@ -61,18 +56,30 @@ export default function ModalFormAd({ open, ad, handleClose }: TModalForm) {
 
   type createFormAd = z.infer<typeof formAd>
 
-  const { register, watch, formState: { errors }, clearErrors, setValue, handleSubmit, setError } = useForm<createFormAd>({
-    defaultValues: {
-      subjects: ad?.subjectId || '',
-      name: ad?.name || '',
-      hourStart: ad?.hourStart ? new Date(ad?.hourStart).toLocaleTimeString() : '' || '',
-      hourEnd: ad?.hourEnd ? new Date(ad?.hourEnd).toLocaleTimeString() : '' || '',
-      linkCall: ad?.linkCall || '',
-      useVoice: ad?.useVoice || true,
-      useVideo: ad?.useVideo || true,
-    },
+  const initialValues = {
+    subjects: ad?.subjectId ?? '',
+    name: ad?.name ?? '',
+    hourStart: ad?.hourStart ? format(new Date(ad?.hourStart), 'HH:mm') : '' ,
+    hourEnd: ad?.hourEnd ? format(new Date(ad?.hourEnd), 'HH:mm') : '' ,
+    weekDay: ad?.weekDay ?? [],
+    linkCall: ad?.linkCall ?? '',
+    useVoice: ad?.useVoice ? true : false,
+    useVideo: ad?.useVideo ? true : false,
+  }
+
+  
+  const { register, watch, formState: { errors }, clearErrors, setValue, handleSubmit, setError, reset } = useForm<createFormAd>({
+    defaultValues: initialValues,
     resolver: zodResolver(formAd),
   });
+
+  useEffect(() => {
+    reset(initialValues);
+    setSelectSubjects(subjects?.map((subject: TSubjects) => ({ value: subject.id, label: subject.name })));
+    setAlignment(ad?.weekDay ?? []);
+  }, [open]);
+
+
 
   const handleChange = (
     event: React.MouseEvent<HTMLElement>,
@@ -128,19 +135,19 @@ export default function ModalFormAd({ open, ad, handleClose }: TModalForm) {
 
     },
     onSuccess: async () => {
-      await snackbarContext.success('Anúncio criado com sucesso!');
+      snackbarContext.success( ad?.id ? 'Anúncio editado com sucesso!' : 'Anúncio criado com sucesso!');
       await handleRefresh();
       handleClose();
     },
     onError: (data) => {
       setError('root', { message: data.message});
+      snackbarContext.error(data.message);
     }
   })
 
-  console.log(ad)
-
   async function handleRefresh() {
     await queryClient.refetchQueries({ queryKey: ['subjects'] });
+    await queryClient.refetchQueries({ queryKey: ['subjectAds', ad?.userId] });
   }
 
 
@@ -149,7 +156,11 @@ export default function ModalFormAd({ open, ad, handleClose }: TModalForm) {
     <div>
       <Modal
         open={open}
-        onClose={handleClose}
+        onClose={() => {
+            handleClose();
+            reset();  
+          }
+        }
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -171,8 +182,9 @@ export default function ModalFormAd({ open, ad, handleClose }: TModalForm) {
                 {...register('subjects')}
                 variant="standard"
                 required
+                disabled={Boolean(ad?.id)}
               >
-                {selectSubjects.map((option) => (
+                {selectSubjects?.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
@@ -239,8 +251,30 @@ export default function ModalFormAd({ open, ad, handleClose }: TModalForm) {
               </div> 
 
               <FormGroup>
-                <FormControlLabel control={<Switch defaultChecked color='success' {...register('useVoice')}/>} label="Microfone" className='text-gray-500' />
-                <FormControlLabel control={<Switch defaultChecked color='success' {...register('useVideo')}/>} label="Câmera" className='text-gray-500' />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={watch('useVoice')}
+                      color='success'
+                      onChange={(e) => setValue('useVoice', e.target.checked)}
+                      value={watch('useVoice')}
+                    />
+                  }
+                  label="Microfone"
+                  className='text-gray-500'
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={watch('useVideo')}
+                      color='success'
+                      value={watch('useVideo')}
+                      onChange={(e) => setValue('useVideo', e.target.checked)}
+                    />
+                  }
+                  label="Câmera"
+                  className='text-gray-500'
+                />
               </FormGroup>
 
               <div style={{display: 'flex', gap: 16, alignContent: 'center', marginBottom: 32, justifyContent: 'flex-end' }}>

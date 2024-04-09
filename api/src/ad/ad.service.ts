@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateAdDto } from './dto/create-ad.dto';
@@ -177,13 +178,14 @@ export class AdService {
     return editedAd;
   }
 
-  async updateAd(id: string, data: CreateAdDto) {
-    await this.exists(id);
+  async updateAd(id: any, data: CreateAdDto) {
+    await this.exists(id.id);
+    const { userId, subjectId, ...adData } = data;
     return await this.prismaService.ad.update({
       where: {
-        id,
+        id: id.id,
       },
-      data,
+      data: adData,
     });
   }
 

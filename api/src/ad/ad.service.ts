@@ -49,22 +49,13 @@ export class AdService {
   }
 
   async listAdsActive() {
-    const userAd = await this.prismaService.userAd.findMany({
-      where: {
-        status: 'ACTIVE',
-      },
-    });
-
     const ad = await this.prismaService.ad.findMany({
       where: {
         status: 'ACTIVE',
       },
     });
 
-    return {
-      ad,
-      ...userAd,
-    };
+    return ad;
   }
 
   async listAdsInactive() {

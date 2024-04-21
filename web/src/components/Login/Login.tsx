@@ -52,13 +52,7 @@ export default function Login({ onLogin }: TLogin) {
     setError('password', { message: 'Email ou senha inválidos' });
     }
 
-  }})
-
-  // async function handlerUserStore() {
-  //   const response = await getDataUserToken()
-
-  //   console.log(response)
-  // }
+  }});
 
   const handleClickShowPassword = () => {
     setValue('showPassword', !watch('showPassword'));

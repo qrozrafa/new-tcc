@@ -6,7 +6,7 @@ import ModalFormAd from "../ModalFormAd/ModalFormAd";
 import { useStore } from "zustand";
 import { TSubjects } from "@/type/subject";
 
-export function NotFoundAd({subjects: TSubjects}: {subjects: TSubjects[]}) {
+export function NotFoundAd({ subjects, subjectId }: {subjects: TSubjects[], subjectId?: string}) {
   const isMobile = useScreenSize(688);
   const [openModal, setOpenModal] = useState(false);
   const authStore = useStore(useAuthStore);
@@ -37,7 +37,8 @@ export function NotFoundAd({subjects: TSubjects}: {subjects: TSubjects[]}) {
       <ModalFormAd
         open={openModal}
         handleClose={() => {setOpenModal(false)}}
-        subjects={TSubjects}
+        subjects={subjects}
+        subjectId={subjectId}
       />
     </Fragment>
   )

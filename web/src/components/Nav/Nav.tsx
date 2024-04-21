@@ -55,7 +55,7 @@ export default function Nav() {
             <Typography
               variant="h6"
               component="div"
-              sx={{ flexGrow: 1, color: 'rgb(22 163 74)'}}
+              sx={{ flexGrow: 1, color: 'rgb(22 163 74)', width: '100%' }}
               className='underline'
               onClick={() => {
                 if (!authenticated) {
@@ -77,7 +77,10 @@ export default function Nav() {
         open={open}
         onClose={handleClose}
         TransitionComponent={Fade}
-      >
+      > 
+        {user?.role === 'ADMIN' && (
+          <MenuItem onClick={() => router.push('/painel')}>Painel</MenuItem>
+        )}
         <MenuItem onClick={() => router.push('/profile')}>Perfil</MenuItem>
         <MenuItem
           onClick={() => {

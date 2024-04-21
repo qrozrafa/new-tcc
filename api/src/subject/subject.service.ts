@@ -49,10 +49,13 @@ export class SubjectService {
             subjectAd.userId,
           );
           const detailAd = await this.adService.getAdById(subjectAd.adId);
+
+          const { name: nameUser, id } = detailUser;
           return {
+            nameUser,
+            userId: id,
             ...subjectAd,
-            detailUser,
-            detailAd,
+            ...detailAd,
           };
         }),
       );

@@ -13,20 +13,23 @@ export type TAd = {
 }
 
 export type DetailAd = {
-  id:        string;
-  name:      string;
+  nameUser:  string;
   userId:    string;
+  id:        string;
+  adId:      string;
   subjectId: string;
+  nameAd:    string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  status:    string;
+  name:      string;
   weekDay:   string[];
   hourStart: Date;
   hourEnd:   Date;
   useVoice:  boolean;
   useVideo:  boolean;
   linkCall:  string;
-  status:    string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: null;
 }
 
 export type DetailUser = {

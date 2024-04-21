@@ -2,26 +2,37 @@
 import { Layout } from "@/components/layout";
 import { getSubject, getSubjectAds } from "@/service/subject";
 import { Divisor } from "@/styles/styles";
-import { TAd } from "@/type/ads";
+import { DetailAd } from "@/type/ads";
 import { TSubjects } from "@/type/subject";
 import { weekDays } from "@/utils/constants";
-import { Mic, Search, VideoCameraFront } from "@mui/icons-material";
-import { Button, CircularProgress, TextField, Tooltip, Typography } from "@mui/material";
+import { Delete, Edit, Mic, Search, VideoCameraFront } from "@mui/icons-material";
+import { Button, CircularProgress, IconButton, TextField, Tooltip, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from 'date-fns';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/auth";
 import { NotFoundAd } from "@/components/NotFoundAd/NotFoundAd";
 import { useStore } from "zustand";
+import DeleteAd from "@/components/DeleteAd/DeleteAd";
+import ModalFormAd from "@/components/ModalFormAd/ModalFormAd";
+import { useSubjectsStore } from "@/store/subjects";
+import { useUserStore } from "@/store/user";
 
 export default function Subject() {
   const param = useParams();
+  const subjectsStore = useStore(useSubjectsStore);
+  const authStore = useStore(useAuthStore);
+  const userStore = useStore(useUserStore);
 
   const [search, setSearch] = useState('');
-  const [ads, setAds] = useState<TAd[]>([]);
-  const authStore = useStore(useAuthStore);
+  const [ads, setAds] = useState<DetailAd[]>([]);
+  const [openModalDeleteAd, setOpenModalDeleteAd] = useState<boolean>(false);
+  const [openModalEditAd, setOpenModalEditAd] = useState<boolean>(false);
+  const [adSelected, setAdSelected] = useState<DetailAd>();
   const { authenticated } = authStore;
+  const { subjects } = subjectsStore;
+  const { user } = userStore;
 
 
   const { data: subject, isFetching: loadingSubject } = useQuery<TSubjects>({
@@ -33,32 +44,42 @@ export default function Subject() {
     staleTime: 0,
   });
 
-  const {isFetching: loadingSubjectAds } = useQuery<TAd[]>({
-    queryKey: ['subjectAds', param.id],
+  const {isFetching: loadingSubjectAds, refetch } = useQuery<DetailAd[]>({
+    queryKey: ['subjectAds', param.id as string],
     queryFn: async () => {
-      const response = await getSubjectAds(param.id as string)
-      setAds(response)
+      const resp =  await getSubjectAds(param.id as string);
+      await setAds(resp)
       return []
     },
     enabled: true,
     staleTime: 0,
   });
-
+  
   function weekDaysSelected(days: string[]): string {
     const daysSeletected = days.map(day => `${weekDays[day]}`);
     let daysFormated: string;
-
+    
     if (daysSeletected.length === 1) {
       daysFormated = daysSeletected[0];
     } else {
       daysFormated = daysSeletected.slice(0, -1).join(', ') + ' e ' + daysSeletected[daysSeletected.length - 1];
     }
-   return daysFormated;
+    return daysFormated;
   }
-
+  
   const filteredAds = ads?.filter(ad => {
     return ad.nameAd.toLowerCase().includes(search.toLowerCase())
   })
+  
+  async function handleDeleteAd(ad: DetailAd) {
+    await setAdSelected(ad);
+    setOpenModalDeleteAd(true);
+  }
+  
+  async function handleEditAd(ad: DetailAd) {
+    await setAdSelected(ad);
+    setOpenModalEditAd(true);
+  }
 
   return (
     <Layout>
@@ -86,7 +107,7 @@ export default function Subject() {
           </div>
 
           {filteredAds?.length === 0 && (
-            <NotFoundAd />
+            <NotFoundAd subjects={subjects} subjectId={param.id as string}/>
           )}
 
           {filteredAds?.length > 0 && (
@@ -95,29 +116,45 @@ export default function Subject() {
                 <>
                   <div className="flex justify-between">
                     <div className={`flex flex-col gap-1`}>
-                      <Typography variant='body1'className='font-bold text-green-500'><b>{ad.nameAd}</b></Typography>
-                      <Typography variant='body1' className="text-zinc-700">Nome: <b>{ad.detailUser.name}</b></Typography>
-                      <Typography variant='body1'className="text-zinc-700">Dias: <b>{weekDaysSelected(ad.detailAd.weekDay)}</b></Typography>
-                      <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad.detailAd.hourStart, 'HH:mm')} - {format(ad.detailAd.hourEnd, 'HH:mm')}</b></Typography>
+                      <Typography variant='body1'className='font-bold text-green-500'><b>{ad.name}</b></Typography>
+                      <Typography variant='body1' className="text-zinc-700">Nome: <b>{ad.nameUser}</b></Typography>
+                      <Typography variant='body1'className="text-zinc-700">Dias: <b>{weekDaysSelected(ad.weekDay)}</b></Typography>
+                      <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad.hourStart, 'HH:mm')} - {format(ad.hourEnd, 'HH:mm')}</b></Typography>
                       <div className="flex gap-1">
-                      <Tooltip title={ad.detailAd.useVoice ? "Microfone disponível" : "Microfone indisponível"}>
-                        <Mic className={`${ad.detailAd.useVoice ? 'text-green-500' : 'text-gray-300'}`} />
+                      <Tooltip title={ad.useVoice ? "Microfone disponível" : "Microfone indisponível"}>
+                        <Mic className={`${ad.useVoice ? 'text-green-500' : 'text-gray-300'}`} />
                       </Tooltip>
-                      <Tooltip title={ad.detailAd.useVideo ? "Video disponível" : "Video indisponível"}>
-                        <VideoCameraFront className={`${ad.detailAd.useVideo ? 'text-green-500' : 'text-gray-300'}`} />
+                      <Tooltip title={ad.useVideo ? "Video disponível" : "Video indisponível"}>
+                        <VideoCameraFront className={`${ad.useVideo ? 'text-green-500' : 'text-gray-300'}`} />
                       </Tooltip>
                       </div>
                     </div>
-                    <div className={`self-end`}>
-                      <Button
-                        variant='contained'
-                        color='success'
-                        size='small'
-                        disabled={!authenticated}
-                        className="bg-green-500"
-                      >
-                        Conectar
-                      </Button>
+                    <div className={`flex flex-col ${user?.id === ad.userId || user?.role === 'ADMIN' ? 'justify-between' : 'justify-end'}`}>
+                      {(user?.id === ad.userId || user?.role === 'ADMIN') && (
+                        <div className={`flex gap-2 self-start`}>
+                          <Tooltip title="Editar anúncio">
+                            <IconButton color="success" onClick={() => handleEditAd(ad)}>
+                              <Edit color="success"/>
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Excluir anúncio" onClick={() => handleDeleteAd(ad)}>
+                            <IconButton color="error" >
+                              <Delete color="error"/>
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                      )}
+                      <div className={`self-end`}>
+                        <Button
+                          variant='contained'
+                          color='success'
+                          size='small'
+                          disabled={!authenticated}
+                          className="bg-green-500"
+                        >
+                          Conectar
+                        </Button>
+                      </div>
                     </div>
                   </div>
                   <Divisor />
@@ -127,6 +164,18 @@ export default function Subject() {
           )}
         </div>
       )}
+      <DeleteAd
+        open={openModalDeleteAd}
+        handleClose={() => {setOpenModalDeleteAd(false); refetch()}}
+        ad={adSelected}
+      />
+
+      <ModalFormAd
+        open={openModalEditAd}
+        ad={adSelected}
+        handleClose={() => {setOpenModalEditAd(false); refetch()}}
+        subjects={subjects as TSubjects[]}
+      />
     </Layout>
   )
 }

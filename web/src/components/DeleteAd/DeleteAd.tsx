@@ -56,6 +56,7 @@ export default function DeleteAd({ open, ad, handleClose }: TModalForm) {
   })
 
   async function handleRefresh() {
+    await queryClient.refetchQueries({ queryKey: ['subjects'] });
     await queryClient.refetchQueries({ queryKey: ['subjectAds', user?.id] });
   }
 

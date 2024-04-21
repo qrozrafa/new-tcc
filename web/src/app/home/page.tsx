@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { getSubjects } from '@/service/subject'
 import { ImageCard, TSubjects } from '@/type/subject'
 import { CircularProgress, Typography } from '@mui/material'
+// @ts-ignore
 import { Splide, SplideSlide } from '@splidejs/react-splide'
 import '@splidejs/react-splide/css'
 import { useQuery } from '@tanstack/react-query'
@@ -27,10 +28,13 @@ import useScreenSize from '@/utils/resize'
 import { useRouter } from 'next/navigation'
 import { Layout } from '@/components/layout'
 import { NotFoundAd } from '@/components/NotFoundAd/NotFoundAd'
+import { useEffect } from 'react'
+import { useSubjectsStore } from '@/store/subjects'
 
 export default function Home() {
   const router = useRouter();
   const isMobile = useScreenSize(688);
+  const useSubjects = useSubjectsStore();
 
   const { data: subjects, isFetching: loadingSubjects } = useQuery<TSubjects[]>({
     queryKey: ['subjects'],
@@ -57,6 +61,10 @@ export default function Home() {
   function setImageCard(image: ImageCard): StaticImport | string {
     return imageMap[image] || image;
   }
+
+  useEffect(() => {
+    useSubjects.setSubjects(subjects || []);
+  }, [loadingSubjects === false])
 
   return (
     <>

@@ -32,11 +32,12 @@ const style = {
 type TModalForm = {
   open: boolean;
   ad?: DetailAd;
+  subjectId?: string;
   subjects: TSubjects[];
   handleClose: () => void;
 }
 
-export default function ModalFormAd({ open, ad, subjects, handleClose }: TModalForm) {
+export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose }: TModalForm) {
   const queryClient = useQueryClient();
   const useUser = useUserStore();
   const snackbarContext = useContext(SnackbarContext);
@@ -57,7 +58,7 @@ export default function ModalFormAd({ open, ad, subjects, handleClose }: TModalF
   type createFormAd = z.infer<typeof formAd>
 
   const initialValues = {
-    subjects: ad?.subjectId ?? '',
+    subjects: ad?.subjectId || subjectId || '',
     name: ad?.name ?? '',
     hourStart: ad?.hourStart ? format(new Date(ad?.hourStart), 'HH:mm') : '' ,
     hourEnd: ad?.hourEnd ? format(new Date(ad?.hourEnd), 'HH:mm') : '' ,
@@ -148,6 +149,7 @@ export default function ModalFormAd({ open, ad, subjects, handleClose }: TModalF
   async function handleRefresh() {
     await queryClient.refetchQueries({ queryKey: ['subjects'] });
     await queryClient.refetchQueries({ queryKey: ['subjectAds', ad?.userId] });
+    await queryClient.refetchQueries({ queryKey: ['subjectAds', subjectId] });
   }
 
 
@@ -182,7 +184,7 @@ export default function ModalFormAd({ open, ad, subjects, handleClose }: TModalF
                 {...register('subjects')}
                 variant="standard"
                 required
-                disabled={Boolean(ad?.id)}
+                disabled={Boolean(ad?.id) || Boolean(subjectId)}
               >
                 {selectSubjects?.map((option) => (
                   <option key={option.value} value={option.value}>

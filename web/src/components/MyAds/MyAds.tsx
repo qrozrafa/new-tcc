@@ -1,9 +1,7 @@
 import { getAdsByUser } from "@/service/profile";
-import { useAuthStore } from "@/store/auth";
 import { useUserStore } from "@/store/user";
 import { Divisor } from "@/styles/styles";
 import { DetailAd } from "@/type/ads";
-import { weekDays } from "@/utils/constants";
 import { Delete, Edit, Mic, VideoCameraFront } from "@mui/icons-material";
 import { CircularProgress, IconButton, Tooltip, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
@@ -13,24 +11,17 @@ import DeleteAd from "../DeleteAd/DeleteAd";
 import { useState } from "react";
 import { weekDaysSelected } from "@/utils/utils";
 import ModalFormAd from "../ModalFormAd/ModalFormAd";
-import { getSubjects } from "@/service/subject";
 import { TSubjects } from "@/type/subject";
+import { useSubjectsStore } from "@/store/subjects";
 
 export default function MyAds() {
-  const useAuth = useStore(useAuthStore);
   const useUser = useStore(useUserStore);
+  const subjectsStore = useStore(useSubjectsStore);
   const [openModalDeleteAd, setOpenModalDeleteAd] = useState<boolean>(false);
   const [openModalEditAd, setOpenModalEditAd] = useState<boolean>(false);
   const [adSelected, setAdSelected] = useState<DetailAd>();
   const { user } = useUser;
-  const { authenticated } = useAuth;
-
-  const { data: subjects, isFetching: loadingSubjects } = useQuery<TSubjects[]>({
-    queryKey: ['subjects', 'profile'],
-    queryFn: async () => {
-      return await getSubjects()
-    },
-  });
+  const { subjects } = subjectsStore;
 
 
   const {data: dataSubjectAds, isFetching: loadingSubjectAds } = useQuery<DetailAd[]>({

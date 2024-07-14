@@ -1,17 +1,12 @@
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
-import { useContext, useEffect, useState } from 'react';
-import { Button, FormControlLabel, FormGroup, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
-import { DetailAd, TOptions } from '@/type/ads';
+import { useContext } from 'react';
+import { Button, Typography } from '@mui/material';
+import { DetailAd } from '@/type/ads';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { TSubjects } from '@/type/subject';
-import { InputTime } from '../inputs/InputTime';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useUserStore } from '@/store/user';
-import { createAd, deleteAd } from '@/service/formAd';
-import { format, set } from 'date-fns';
+import { deleteAd } from '@/service/formAd';
+import { format } from 'date-fns';
 import { SnackbarContext } from '@/context/snackbar.context';
 import { weekDaysSelected } from '@/utils/utils';
 import { useStore } from 'zustand';
@@ -58,6 +53,7 @@ export default function DeleteAd({ open, ad, handleClose }: TModalForm) {
   async function handleRefresh() {
     await queryClient.refetchQueries({ queryKey: ['subjects'] });
     await queryClient.refetchQueries({ queryKey: ['subjectAds', user?.id] });
+    await queryClient.refetchQueries({ queryKey: ['allAds'] });
   }
 
   return (

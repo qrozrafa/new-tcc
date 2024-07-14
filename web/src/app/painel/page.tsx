@@ -1,7 +1,9 @@
 'use client'
-import { Layout } from "@/components/layout"
-import { BookSharp, Edit, ListAlt, Password, Person3 } from "@mui/icons-material";
-import { BottomNavigation, BottomNavigationAction, Box, Typography } from "@mui/material"
+import AllAds from "@/components/AllAds/AllAds";
+import ListSubjects from "@/components/ListSubjects/ListSubjects";
+import { Layout } from "@/components/layout";
+import { BookSharp, ListAlt, Person3 } from "@mui/icons-material";
+import { BottomNavigation, BottomNavigationAction, Box, Typography } from "@mui/material";
 import { useState } from "react";
 
 export default function Painel() {
@@ -50,6 +52,12 @@ export default function Painel() {
               <BottomNavigationAction label="Usuários" icon={<Person3 />} />
             </BottomNavigation>
           </Box>
+          {tab === 0 && (
+            <AllAds />
+          )}
+          {tab === 1 && (
+            <ListSubjects />
+          )}
         </div>
       </div>
     </Layout>

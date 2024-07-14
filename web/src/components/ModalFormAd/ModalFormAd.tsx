@@ -3,7 +3,7 @@ import Modal from '@mui/material/Modal';
 import { useContext, useEffect, useState } from 'react';
 import { Button, FormControlLabel, FormGroup, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { DetailAd, TOptions } from '@/type/ads';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TSubjects } from '@/type/subject';
 import { InputTime } from '../inputs/InputTime';
 import { z } from 'zod';
@@ -13,8 +13,6 @@ import { useUserStore } from '@/store/user';
 import { createAd, updateAd } from '@/service/formAd';
 import { format, set } from 'date-fns';
 import { SnackbarContext } from '@/context/snackbar.context';
-import { getSubjects } from '@/service/subject';
-import Subject from '@/app/subject/[id]/page';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -98,8 +96,8 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
 
   const { mutate: submitFormAd, isPending: isLoading } = useMutation({
     mutationFn: async () => {
-      const startTimeString = watch('hourStart'); // Hora inicial no formato HH:mm
-      const endTimeString = watch('hourEnd'); // Hora final no formato HH:mm
+      const startTimeString = watch('hourStart');
+      const endTimeString = watch('hourEnd');
 
       // Divide as strings de hora em horas e minutos
       const [startHourString, startMinuteString] = startTimeString.split(':');
@@ -150,6 +148,7 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
     await queryClient.refetchQueries({ queryKey: ['subjects'] });
     await queryClient.refetchQueries({ queryKey: ['subjectAds', ad?.userId] });
     await queryClient.refetchQueries({ queryKey: ['subjectAds', subjectId] });
+    await queryClient.refetchQueries({ queryKey: ['allAds'] });
   }
 
 

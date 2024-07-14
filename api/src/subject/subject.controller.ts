@@ -29,8 +29,12 @@ export class SubjectController {
   }
 
   @Get()
-  async getAllSubjects() {
+  async getSubjectsActive() {
     return this.subjectService.listSubjects();
+  }
+  @Get('all')
+  async getAllSubjects() {
+    return this.subjectService.listAllSubjects();
   }
 
   @Get(':id')
@@ -64,5 +68,12 @@ export class SubjectController {
   @Put('restore/:id')
   async restoreSubject(@Param('id', ParseUUIDPipe) id: string) {
     return this.subjectService.restoreSubject(id);
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.ADMIN)
+  @Get('all/ads')
+  async getAllAdsByAllUsersEndSubjects() {
+    return this.subjectService.getAllAdsByAllUsersEndSubjects();
   }
 }

@@ -10,7 +10,7 @@ import { Button, CircularProgress, IconButton, TextField, Tooltip, Typography } 
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from 'date-fns';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuthStore } from "@/store/auth";
 import { NotFoundAd } from "@/components/NotFoundAd/NotFoundAd";
 import { useStore } from "zustand";
@@ -137,23 +137,25 @@ export default function Subject() {
                               <Edit color="success"/>
                             </IconButton>
                           </Tooltip>
-                          <Tooltip title="Excluir anúncio" onClick={() => handleDeleteAd(ad)}>
-                            <IconButton color="error" >
+                          <Tooltip title="Excluir anúncio">
+                            <IconButton color="error" onClick={() => handleDeleteAd(ad)}>
                               <Delete color="error"/>
                             </IconButton>
                           </Tooltip>
                         </div>
                       )}
                       <div className={`self-end`}>
-                        <Button
-                          variant='contained'
-                          color='success'
-                          size='small'
-                          disabled={!authenticated}
-                          className="bg-green-500"
-                        >
-                          Conectar
-                        </Button>
+                        {user?.id !== ad.userId && (  
+                          <Button
+                            variant='contained'
+                            color='success'
+                            size='small'
+                            disabled={!authenticated}
+                            className="bg-green-500"
+                          >
+                            Conectar
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>

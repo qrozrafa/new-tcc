@@ -10,7 +10,7 @@ import { Button, CircularProgress, IconButton, TextField, Tooltip, Typography } 
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from 'date-fns';
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useAuthStore } from "@/store/auth";
 import { NotFoundAd } from "@/components/NotFoundAd/NotFoundAd";
 import { useStore } from "zustand";
@@ -18,9 +18,12 @@ import DeleteAd from "@/components/DeleteAd/DeleteAd";
 import ModalFormAd from "@/components/ModalFormAd/ModalFormAd";
 import { useSubjectsStore } from "@/store/subjects";
 import { useUserStore } from "@/store/user";
+import { SnackbarContext } from "@/context/snackbar.context";
 
 export default function Subject() {
   const param = useParams();
+  const snackbarContext = useContext(SnackbarContext);
+
   const subjectsStore = useStore(useSubjectsStore);
   const authStore = useStore(useAuthStore);
   const userStore = useStore(useUserStore);
@@ -79,6 +82,13 @@ export default function Subject() {
   async function handleEditAd(ad: DetailAd) {
     await setAdSelected(ad);
     setOpenModalEditAd(true);
+  }
+
+  function conectedAd(link: string) {
+    if (!link) return
+
+    navigator.clipboard.writeText(link);
+    snackbarContext.success('Link copiado!');
   }
 
   return (
@@ -152,6 +162,7 @@ export default function Subject() {
                             size='small'
                             disabled={!authenticated}
                             className="bg-green-500"
+                            onClick={() => conectedAd(ad.linkCall)}
                           >
                             Conectar
                           </Button>

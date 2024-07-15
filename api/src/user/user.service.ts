@@ -31,6 +31,26 @@ export class UserService {
     }
   }
 
+  async listAllUsers() {
+    const users = (await this.prisma.user.findMany()).sort((a, b) => {
+      if (a.createdAt < b.createdAt) {
+        return -1;
+      }
+      if (a.createdAt > b.createdAt) {
+        return 1;
+      }
+      return 0;
+    });
+
+    if (users) {
+      const usersWithoutPassword = users.map((user) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      return usersWithoutPassword;
+    }
+  }
+
   async listUsersAdmin() {
     const users = await this.prisma.user.findMany({
       where: { status: 'ACTIVE', role: 'ADMIN' },

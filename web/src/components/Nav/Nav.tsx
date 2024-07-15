@@ -40,7 +40,7 @@ export default function Nav() {
       <AppBar position="static" color='transparent' sx={{ boxShadow: 0 }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between'}}>
           <>
-            <Image src={Logo} alt='logo duo study' onClick={() => router.push('/home')} className='cursor-pointer' width={80} height={80}/>
+            <Image src={Logo} alt='logo duo study' onClick={() => router.push('/')} className='cursor-pointer' width={80} height={80}/>
           </>
           <div
             style={{ display: 'flex', alignItems: 'center'}}
@@ -86,6 +86,7 @@ export default function Nav() {
           onClick={() => {
             useAuthStore.getState().removeToken();
             useUserStore.getState().removeUser();
+            handleClose();
             router.push('/');
           }}
         >

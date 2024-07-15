@@ -26,3 +26,30 @@ export async function editDataUser(id?: string, data?: DataEditUser) {
     console.error('Erro durante a edição do perfil:', error);
   }
 }
+
+export async function getUsers() {
+  try {
+    const response = await api.get(`/users/all`);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao carregar usuarios:', error);
+  }
+}
+
+export async function disableUser(userId: string) {
+  try {
+    const response = await api.delete(`/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao deletar usuario:', error);
+  }
+}
+
+export async function activeUser(userId: string) {
+  try {
+    const response = await api.put(`/users/restore/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao ativar usuario:', error);
+  }
+}

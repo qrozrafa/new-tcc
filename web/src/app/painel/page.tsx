@@ -1,6 +1,7 @@
 'use client'
 import AllAds from "@/components/AllAds/AllAds";
 import ListSubjects from "@/components/ListSubjects/ListSubjects";
+import ListUsers from "@/components/ListUsers/ListUsers";
 import { Layout } from "@/components/layout";
 import { BookSharp, ListAlt, Person3 } from "@mui/icons-material";
 import { BottomNavigation, BottomNavigationAction, Box, Typography } from "@mui/material";
@@ -57,6 +58,9 @@ export default function Painel() {
           )}
           {tab === 1 && (
             <ListSubjects />
+          )}
+          {tab === 2 && (
+            <ListUsers />
           )}
         </div>
       </div>

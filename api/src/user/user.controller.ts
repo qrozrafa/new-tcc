@@ -31,8 +31,14 @@ export class UserController {
 
   @Roles(Role.ADMIN, Role.USER)
   @Get()
-  async getAllUsers() {
+  async getUsers() {
     return this.userService.listUsers();
+  }
+
+  @Roles(Role.ADMIN)
+  @Get('all')
+  async getAllUsers() {
+    return this.userService.listAllUsers();
   }
 
   @Roles(Role.ADMIN)

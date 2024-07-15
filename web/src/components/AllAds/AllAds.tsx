@@ -7,21 +7,25 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useStore } from "zustand";
 import DeleteAd from "../DeleteAd/DeleteAd";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { weekDaysSelected } from "@/utils/utils";
 import ModalFormAd from "../ModalFormAd/ModalFormAd";
 import { TSubjects } from "@/type/subject";
 import { useSubjectsStore } from "@/store/subjects";
 import { getAllAds } from "@/service/painel";
 import { useAuthStore } from "@/store/auth";
+import { SnackbarContext } from "@/context/snackbar.context";
 
 export default function AllAds() {
+  const snackbarContext = useContext(SnackbarContext);
   const useUser = useStore(useUserStore);
   const authStore = useStore(useAuthStore);
   const subjectsStore = useStore(useSubjectsStore);
+
   const [openModalDeleteAd, setOpenModalDeleteAd] = useState<boolean>(false);
   const [openModalEditAd, setOpenModalEditAd] = useState<boolean>(false);
   const [adSelected, setAdSelected] = useState<DetailAd>();
+
   const { authenticated } = authStore;
   const { user } = useUser;
   const { subjects } = subjectsStore;
@@ -43,6 +47,13 @@ export default function AllAds() {
   async function handleEditAd(ad: DetailAd) {
     await setAdSelected(ad);
     setOpenModalEditAd(true);
+  }
+
+  function conectedAd(link: string) {
+    if (!link) return
+
+    navigator.clipboard.writeText(link);
+    snackbarContext.success('Link copiado!');
   }
 
 
@@ -97,6 +108,7 @@ export default function AllAds() {
                             size='small'
                             disabled={!authenticated}
                             className="bg-green-500"
+                            onClick={() => conectedAd(ad.linkCall)}
                           >
                             Conectar
                           </Button>

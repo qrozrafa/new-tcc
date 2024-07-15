@@ -174,9 +174,7 @@ export class SubjectService {
     });
 
     if (fitUsersAds) {
-      const listUsers = await this.prisma.user.findMany({
-        where: { status: 'ACTIVE' },
-      });
+      const listUsers = await this.prisma.user.findMany();
 
       const fitUsers = listUsers.map((user) => {
         return {

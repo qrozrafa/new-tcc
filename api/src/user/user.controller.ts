@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,7 +9,9 @@ import {
   Patch,
   Post,
   Put,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePutUserDto } from './dto/update-put-user.dto';
@@ -18,11 +21,17 @@ import { RoleGuard } from 'src/guards/role.guard';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/enums/role.enum';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { join } from 'path';
+import { FileService } from 'src/file/file.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(AuthGuard, RoleGuard)
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly fileService: FileService,
+  ) {}
 
   @Post()
   async create(@Body() data: CreateUserDto) {
@@ -74,6 +83,14 @@ export class UserController {
     return this.userService.updatePartialUser(id, data);
   }
 
+  @Patch(`reset-password/:id`)
+  async resetPassword(
+    @Param('id', ParseUUIDPipe) id,
+    @Body() data: UpdatePatchUserDto,
+  ) {
+    return this.userService.resetPasswordUser(id, data);
+  }
+
   @Roles(Role.ADMIN, Role.USER)
   @Delete(`:id`)
   async deleteUser(@Param('id', ParseUUIDPipe) id) {
@@ -84,5 +101,61 @@ export class UserController {
   @Put(`restore/:id`)
   async restoreUser(@Param('id', ParseUUIDPipe) id) {
     return this.userService.restoreUser(id);
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.ADMIN)
+  @Post('image/:id')
+  async uploadImage(
+    @Param('id', ParseUUIDPipe) id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const user = await this.userService.getUserById(id);
+    const path = join(
+      __dirname,
+      '..',
+      '..',
+      'storage',
+      'user',
+      `image-${id}.png`,
+    );
+
+    try {
+      await this.fileService.uploadFile(file, path);
+      await this.userService.updatePartialUser(id, {
+        name: user.name,
+        image: `image-${id}.png`,
+      });
+      return { msg: 'Imagem alterada com sucesso' };
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.ADMIN)
+  @Delete('image/:id')
+  async deleteImage(@Param('id', ParseUUIDPipe) id: string) {
+    const user = await this.userService.getUserById(id);
+    const path = join(
+      __dirname,
+      '..',
+      '..',
+      'storage',
+      'user',
+      `image-${id}.png`,
+    );
+
+    try {
+      await this.fileService.deleteFile(path);
+      await this.userService.updatePartialUser(id, {
+        name: user.name,
+        image: null,
+      });
+      return { msg: 'Imagem deletada com sucesso' };
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }

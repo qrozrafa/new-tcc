@@ -18,14 +18,6 @@ export default function EditProfile() {
   const editData = z.object({
     name: z.string().min(4, 'Insira o seu nome'),
     email: z.string().email('Insira um endereço de e-mail válido'),
-    password: z
-      .string()
-      .min(8, 'A senha deve ter pelo menos 8 caracteres')
-      .regex(/[A-Z]/, 'A senha deve conter pelo menos uma letra maiúscula')
-      .regex(/[a-z]/, 'A senha deve conter pelo menos uma letra minúscula')
-      .regex(/[0-9]/, 'A senha deve conter pelo menos um número')
-      .regex(/[^a-zA-Z0-9]/, 'A senha deve conter pelo menos um caractere especial'),
-    showPassword: z.boolean().default(false),
     cpf: z.string().min(11, 'Insira o seu CPF'),
     ra: z.string().min(6, 'Insira o seu RA'),
     role: z.string().default('USER').optional(),
@@ -37,7 +29,6 @@ export default function EditProfile() {
     defaultValues: {
       name: user?.name,
       email: user?.email,
-      showPassword: false,
       cpf: user?.cpf,
       ra: user?.ra,
       role: user?.role,
@@ -69,14 +60,13 @@ export default function EditProfile() {
     }
   })
 
+  const onSubmit = handleSubmit(() => {
+    handleRegister()
+  })
+
 
   return (
     <div className="w-[300px] flex flex-col justify-center gap-4 mx-auto">
-      {Object.keys(errors).length > 0 && (
-        Object.values(errors).map((item, index) => (
-          <Alert severity="error">{item.message}</Alert>
-        ))
-      )}
       <TextField
         variant="standard"
         placeholder="Digite seu nome"
@@ -89,7 +79,8 @@ export default function EditProfile() {
             clearErrors('name')
           }
         }
-        error={!!errors.name}
+        error={Boolean(errors.name)}
+        helperText={errors.name?.message}
         size="small"
         required
         autoFocus
@@ -106,7 +97,8 @@ export default function EditProfile() {
             clearErrors('email')
           }
         }
-        error={!!errors.email}
+        error={Boolean(errors.email)}
+        helperText={errors.email?.message}
         size="small"
         required
       />
@@ -122,7 +114,8 @@ export default function EditProfile() {
             clearErrors('cpf')
           }
         }
-        error={!!errors.cpf}
+        error={Boolean(errors.cpf)}
+        helperText={errors.cpf?.message}
         size="small"
         required
         inputProps={{ maxLength: 11 }}
@@ -139,7 +132,8 @@ export default function EditProfile() {
             clearErrors('ra')
           }
         }
-        error={!!errors.ra}
+        error={Boolean(errors.ra)}
+        helperText={errors.ra?.message}
         size="small"
         required
         inputProps={{ maxLength: 6 }}
@@ -151,7 +145,7 @@ export default function EditProfile() {
           color="success"
           type="submit"
           fullWidth
-          onClick={() => handleRegister()}
+          onClick={onSubmit}
           size="small"
           className="bg-green-600"
           disabled={isLoading}

@@ -16,7 +16,6 @@ enum UserState {
 enum UserRole {
   USER
   ADMIN
-  SUPER_ADMIN
 }
 
 enum SubjectState {
@@ -60,6 +59,7 @@ model User {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
   status    UserState @default(ACTIVE)
+  image     String?
   userAd    UserAd[]
 
   @@index([id, name])
@@ -73,6 +73,7 @@ model Subject {
   updatedAt DateTime     @updatedAt @map("updated_at")
   deletedAt DateTime?    @map("deleted_at")
   status    SubjectState @default(ACTIVE)
+  image     String?
   userAd    UserAd[]
 
   @@index([id, name])

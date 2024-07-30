@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,7 +8,9 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/enums/role.enum';
@@ -16,10 +19,16 @@ import { RoleGuard } from 'src/guards/role.guard';
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDTO } from './dto/update-subject.dto';
+import { join } from 'path';
+import { FileService } from 'src/file/file.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('subjects')
 export class SubjectController {
-  constructor(private readonly subjectService: SubjectService) {}
+  constructor(
+    private readonly subjectService: SubjectService,
+    private readonly fileService: FileService,
+  ) {}
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
@@ -75,5 +84,61 @@ export class SubjectController {
   @Get('all/ads')
   async getAllAdsByAllUsersEndSubjects() {
     return this.subjectService.getAllAdsByAllUsersEndSubjects();
+  }
+
+  @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.ADMIN)
+  @Post('image/:id')
+  async uploadImage(
+    @Param('id', ParseUUIDPipe) id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const subject = await this.subjectService.getSubjectById(id);
+    const path = join(
+      __dirname,
+      '..',
+      '..',
+      'storage',
+      'subject',
+      `image-${id}.png`,
+    );
+
+    try {
+      await this.fileService.uploadFile(file, path);
+      await this.subjectService.updateSubject(id, {
+        name: subject.name,
+        image: `image-${id}.png`,
+      });
+      return { msg: 'Imagem alterada com sucesso' };
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.ADMIN)
+  @Delete('image/:id')
+  async deleteImage(@Param('id', ParseUUIDPipe) id: string) {
+    const subject = await this.subjectService.getSubjectById(id);
+    const path = join(
+      __dirname,
+      '..',
+      '..',
+      'storage',
+      'subject',
+      `image-${id}.png`,
+    );
+
+    try {
+      await this.fileService.deleteFile(path);
+      await this.subjectService.updateSubject(id, {
+        name: subject.name,
+        image: null,
+      });
+      return { msg: 'Imagem deletada com sucesso' };
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
 }

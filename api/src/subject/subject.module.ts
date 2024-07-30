@@ -6,6 +6,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
 import { AdModule } from 'src/ad/ad.module';
 import { UserAdModule } from 'src/user-ad/user-ad.module';
+import { FileModule } from 'src/file/file.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UserAdModule } from 'src/user-ad/user-ad.module';
     forwardRef(() => UserModule),
     forwardRef(() => AdModule),
     forwardRef(() => UserAdModule),
+    forwardRef(() => FileModule),
   ],
   controllers: [SubjectController],
   providers: [SubjectService],

@@ -12,6 +12,7 @@ export type UserData = {
   updatedAt: Date;
   deletedAt: null;
   status:    string;
+  image:     string;
 }
 
 export type UserStoreProps = {

@@ -12,3 +12,8 @@ export type DataEditUser = {
   cpf?: string
   ra?: string
 }
+
+export type TResetPasswordUser = {
+  password: string;
+  token?: string | null;
+}

@@ -13,6 +13,7 @@ import { weekDaysSelected } from "@/utils/utils";
 import ModalFormAd from "../ModalFormAd/ModalFormAd";
 import { TSubjects } from "@/type/subject";
 import { useSubjectsStore } from "@/store/subjects";
+import { NotFoundAd } from "../NotFoundAd/NotFoundAd";
 
 export default function MyAds() {
   const useUser = useStore(useUserStore);
@@ -53,7 +54,7 @@ export default function MyAds() {
       )}
       {!loadingSubjectAds && dataSubjectAds && (
         <>
-          {dataSubjectAds?.length > 0 && (
+          {dataSubjectAds?.length > 0 ? (
           <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex flex-col justify-between rounded-lg`}>
             {dataSubjectAds?.map(ad => (
               <>
@@ -88,6 +89,8 @@ export default function MyAds() {
               </>
             ))}
           </div>
+        ) : (
+          <NotFoundAd subjects={subjects as TSubjects[]} myAds />
         )}
         </>
       )}

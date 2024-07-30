@@ -4,8 +4,7 @@ import { useAuthStore } from "@/store/auth"
 import { Alert, Button, IconButton, InputAdornment, TextField, Typography } from '@mui/material'
 import { z } from 'zod'
 import { Visibility, VisibilityOff } from "@mui/icons-material"
-import { useRouter } from "next/navigation"
-import { createUser, getDataUserToken } from "@/service/user"
+import { createUser } from "@/service/user"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useUserStore } from "@/store/user"
 import { useMutation } from "@tanstack/react-query"
@@ -16,7 +15,6 @@ type TRegister =  {
 }
 
 export default function Register({ onRegister }: TRegister) {
-  const router = useRouter();
   const useAuth = useAuthStore();
   const useUser = useUserStore();
 
@@ -85,14 +83,13 @@ export default function Register({ onRegister }: TRegister) {
     event.preventDefault();
   };
 
+  const onSubmit = handleSubmit(() => {
+    handleRegister();
+  })
+
   return (
     <div className="w-full flex flex-col justify-center gap-4">
       <Typography variant="h5" align="center" className="text-green-500" fontWeight={700}>CRIAÇÃO DE CONTA</Typography>
-      {Object.keys(errors).length > 0 && (
-        Object.values(errors).map((item, index) => (
-          <Alert severity="error">{item.message}</Alert>
-        ))
-      )}
       <TextField
         variant="standard"
         placeholder="Digite seu nome"
@@ -105,7 +102,8 @@ export default function Register({ onRegister }: TRegister) {
             clearErrors('name')
           }
         }
-        error={!!errors.name}
+        error={Boolean(errors.name)}
+        helperText={errors.name?.message}
         size="small"
         required
         autoFocus
@@ -122,7 +120,8 @@ export default function Register({ onRegister }: TRegister) {
             clearErrors('email')
           }
         }
-        error={!!errors.email}
+        error={Boolean(errors.email)}
+        helperText={errors.email?.message}
         size="small"
         required
       />
@@ -155,7 +154,8 @@ export default function Register({ onRegister }: TRegister) {
             clearErrors('ra')
           }
         }
-        error={!!errors.ra}
+        error={Boolean(errors.ra)}
+        helperText={errors.ra?.message}
         size="small"
         required
         inputProps={{ maxLength: 6 }}
@@ -172,7 +172,8 @@ export default function Register({ onRegister }: TRegister) {
             clearErrors('password')
           }
         }
-        error={!!errors.password}
+        error={Boolean(errors.password)}
+        helperText={errors.password?.message}
         size="small"
         required
         InputProps={{
@@ -196,7 +197,7 @@ export default function Register({ onRegister }: TRegister) {
           color="success"
           type="submit"
           fullWidth
-          onClick={() => handleRegister()}
+          onClick={onSubmit}
           size="small"
           className="bg-green-600"
           disabled={isLoading}

@@ -2,6 +2,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -10,6 +11,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthRegisterDTO } from './dto/register-auth.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
+import { UpdatePatchUserDto } from 'src/user/dto/update-patch-user.dto';
 @Injectable()
 export class AuthService {
   private audience = 'users';
@@ -91,7 +93,7 @@ export class AuthService {
     return this.createToken(user);
   }
 
-  async forget(email: string) {
+  async forgot(email: string) {
     const user = this.prisma.user.findFirst({
       where: {
         email,
@@ -107,24 +109,26 @@ export class AuthService {
     return true;
   }
 
-  async reset(password: string, token: string) {
-    // TODO: Implementar verificação de token
+  async resetPasswordUser(password: string, token: string) {
+    const user = this.checkToken(token);
 
-    const tokenAccess = token;
-    const id = '1';
+    if (!user) {
+      throw new NotFoundException('Acesso inspirado!');
+    }
 
-    console.log(tokenAccess);
-
-    const user = await this.prisma.user.update({
-      where: {
-        id,
-      },
-      data: {
+    if (password) {
+      const hashedNewPassword = await bcrypt.hash(
         password,
-      },
-    });
+        await bcrypt.genSalt(),
+      );
 
-    return this.createToken(user);
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashedNewPassword },
+      });
+
+      return this.createToken(user);
+    }
   }
 
   async register(data: AuthRegisterDTO) {

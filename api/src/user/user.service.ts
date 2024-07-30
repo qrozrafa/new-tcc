@@ -83,6 +83,20 @@ export class UserService {
     }
   }
 
+  async getUserByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Email não encontrado!');
+    }
+
+    return user;
+  }
+
   async updateUser(id: string, data: UpdatePutUserDto) {
     await this.exists(id);
     data.password = await bcrypy.hash(data.password, await bcrypy.genSalt());
@@ -108,6 +122,31 @@ export class UserService {
         throw new Error('Senha atual incorreta');
       }
 
+      const hashedNewPassword = await bcrypy.hash(
+        data.newPassword,
+        await bcrypy.genSalt(),
+      );
+
+      await this.prisma.user.update({
+        where: { id: id },
+        data: { password: hashedNewPassword },
+      });
+
+      return { msg: 'Senha atualizada com sucesso' };
+    }
+
+    return await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data,
+    });
+  }
+
+  async resetPasswordUser(id: string, data: UpdatePatchUserDto) {
+    await this.exists(id);
+
+    if (data.newPassword) {
       const hashedNewPassword = await bcrypy.hash(
         data.newPassword,
         await bcrypy.genSalt(),

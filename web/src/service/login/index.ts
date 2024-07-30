@@ -1,5 +1,5 @@
 import api from "@/middleware/api";
-import { UserState } from "@/store/user";
+import { UserData } from "@/store/user";
 
 export type LoginUser = {
   email: string;
@@ -8,7 +8,7 @@ export type LoginUser = {
 
 export type Token = {
   access_token: string;
-  user:  UserState;
+  user:  UserData;
 }
 
 export async function login(crentials: LoginUser): Promise<Token | undefined> {
@@ -18,5 +18,14 @@ export async function login(crentials: LoginUser): Promise<Token | undefined> {
     return response.data;
   } catch (error) {
     console.error('Erro durante o login:', error);
+  }
+}
+
+export async function forgotPassword(email: string) {
+  try {
+    const response = await api.post('/email/forgot', { to: email });
+    return response.data;
+  } catch (error) {
+    console.error('Erro durante o envio de email:', error);
   }
 }

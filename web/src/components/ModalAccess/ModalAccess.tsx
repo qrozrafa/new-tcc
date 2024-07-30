@@ -2,9 +2,10 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { useState } from 'react';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { Login as LoginIcon, PersonAddAlt1 } from '@mui/icons-material';
+import { LockReset, Login as LoginIcon, PersonAddAlt1 } from '@mui/icons-material';
 import Register from '../Register/Register';
 import Login from '../Login/Login';
+import Forgot from '../Forgot/Forgot';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -27,11 +28,16 @@ export default function ModalAccess({ open, handleClose }: TModalAccess) {
 
   const [tab, setTab] = useState(0);
 
+  function handleCloseModal() {
+    setTab(0);
+    handleClose();
+  }
+
   return (
     <div>
       <Modal
         open={open}
-        onClose={handleClose}
+        onClose={handleClose} 
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -62,9 +68,12 @@ export default function ModalAccess({ open, handleClose }: TModalAccess) {
             >
               <BottomNavigationAction label="Entrar" icon={<LoginIcon />} />
               <BottomNavigationAction label="Criar conta" icon={<PersonAddAlt1 />} />
+              <BottomNavigationAction label="Esqueceu sua senha" icon={<LockReset />} />
             </BottomNavigation>
           </Box>
-            {tab === 0 ? <Login onLogin={handleClose}/> : <Register onRegister={handleClose}/>}
+            {tab === 0 && <Login onLogin={handleCloseModal}/>}
+            {tab === 1 && <Register onRegister={handleCloseModal}/>}
+            {tab === 2 && <Forgot onClose={handleCloseModal}/>}
           </Box>
         </>
       </Modal>

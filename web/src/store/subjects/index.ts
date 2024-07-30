@@ -9,6 +9,7 @@ export type SubjectData = {
   deletedAt: null;
   status:    string;
   countAds:  number;
+  image:     string;
 }
 
 export type SubjectsStoreProps = {

@@ -6,6 +6,7 @@ export type TSubjects = {
   deletedAt: null;
   status:    string;
   countAds:  number;
+  image:     string;
 }
 
 export type ImageCard = 
@@ -31,4 +32,5 @@ export type TSubjectAds = {
   updatedAt: Date;
   deletedAt: null;
   status:    string;
+  image:     string;
 }

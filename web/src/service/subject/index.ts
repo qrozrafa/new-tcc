@@ -60,3 +60,34 @@ export async function editSubject(subjectId: string, data: any) {
     console.error('Erro carregar o subject:', error);
   }
 }
+
+export async function createSubject(data: any) {
+  try {
+    const response = await api.post(`/subjects`, data );
+    return response.data;
+  } catch (error) {
+    console.error('Erro carregar o subject:', error);
+  }
+}
+
+export async function uploadImage(subjectId: string, data: any) {
+  try {
+    const response = await api.post(`/subjects/image/${subjectId}`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    } );
+    return response.data;
+  } catch (error) {
+    console.error('Erro upload da image do subject:', error);
+  }
+}
+
+export async function deleteImage(subjectId: string) {
+  try {
+    const response = await api.delete(`/subjects/image/${subjectId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Erro deletar o image do subject:', error);
+  }
+}

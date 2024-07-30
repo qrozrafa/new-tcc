@@ -1,5 +1,5 @@
 import { SnackbarContext } from "@/context/snackbar.context";
-import { editSubject } from "@/service/subject";
+import { createSubject, editSubject } from "@/service/subject";
 import { TSubjects } from "@/type/subject";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Modal, TextField, Typography } from "@mui/material";
@@ -23,7 +23,7 @@ const style = {
 
 type TModalEditSubject = {
   open: boolean;
-  subject: TSubjects;
+  subject?: TSubjects;
   handleClose: () => void;
 }
 export default function ModalEditSubject({open, subject, handleClose}: TModalEditSubject) {
@@ -31,7 +31,7 @@ export default function ModalEditSubject({open, subject, handleClose}: TModalEdi
   const snackbarContext = useContext(SnackbarContext);
 
   const formSubject = z.object({
-    name: z.string().nonempty('Insira o nome da(s) aula(s)'),
+    name: z.string().nonempty('Insira o nome da disciplina'),
   });
 
   type createFormSubject = z.infer<typeof formSubject>
@@ -49,10 +49,14 @@ export default function ModalEditSubject({open, subject, handleClose}: TModalEdi
     mutationFn: async () => {
 
       const data = {
-          name: watch('name'),
+        name: watch('name'),
       };
 
-      await editSubject(subject?.id, data);
+      if (subject?.id) {
+        await editSubject(subject?.id, data);
+      } else {
+        await createSubject(data);
+      }
 
     },
     onSuccess: async () => {
@@ -71,6 +75,10 @@ export default function ModalEditSubject({open, subject, handleClose}: TModalEdi
     await queryClient.refetchQueries({ queryKey: ['allSubjects'] });
   }
 
+  const onSubmit = handleSubmit(() => {
+    submitFormAd();
+  })
+
   return (
     <>
       <Modal
@@ -86,7 +94,7 @@ export default function ModalEditSubject({open, subject, handleClose}: TModalEdi
         <>
           <Box sx={style}>
             <Typography id="modal-modal-title" variant="h6" component="h2" className='text-green-500 mb-3'>
-              Editar disciplina
+              {subject?.id ? `Editar disciplina ${subject?.name}` : 'Criar disciplina'}
             </Typography>
             <div style={{display: 'flex', flexDirection: 'column', gap: 32, margin: `32px 0 0`}}>
               <TextField
@@ -102,12 +110,22 @@ export default function ModalEditSubject({open, subject, handleClose}: TModalEdi
                       clearErrors('name');
                     }
                   }
+                  error={Boolean(errors.name)}
+                  helperText={errors.name?.message}
                   size="small"
                   required
                 />
                 <div style={{display: 'flex', gap: 16, alignContent: 'center', marginBottom: 32, justifyContent: 'flex-end' }}>
                   <Button variant="outlined" color="success" onClick={handleClose}>Cancelar</Button>
-                  <Button variant="contained" color="success" onClick={() => submitFormAd()} disabled={isLoading} className='bg-green-500'>Publicar</Button>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={onSubmit}
+                    disabled={isLoading}
+                    className='bg-green-500'
+                  >
+                    {subject?.id ? 'Salvar' : 'Criar'}
+                  </Button>
                 </div>
             </div>
           </Box>

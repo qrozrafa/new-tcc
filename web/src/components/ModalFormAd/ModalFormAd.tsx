@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import { useContext, useEffect, useState } from 'react';
-import { Button, FormControlLabel, FormGroup, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Alert, Button, FormControlLabel, FormGroup, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { DetailAd, TOptions } from '@/type/ads';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TSubjects } from '@/type/subject';
@@ -42,6 +42,7 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
   
   const [selectSubjects, setSelectSubjects] = useState<TOptions[]>([{label: 'Selecione a disciplina que deseja', value: ''}]);
   const [alignment, setAlignment] = useState<string[]>([]);
+  const [emptyDate, setEmptyDate] = useState<boolean>(false);
 
   const formAd = z.object({
     subjects: z.string().nonempty('Selecione a(s) disciplina(s)'),
@@ -65,7 +66,6 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
     useVoice: ad?.useVoice ? true : false,
     useVideo: ad?.useVideo ? true : false,
   }
-
   
   const { register, watch, formState: { errors }, clearErrors, setValue, handleSubmit, setError, reset } = useForm<createFormAd>({
     defaultValues: initialValues,
@@ -77,8 +77,6 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
     setSelectSubjects(subjects?.map((subject: TSubjects) => ({ value: subject.id, label: subject.name })));
     setAlignment(ad?.weekDay ?? []);
   }, [open]);
-
-
 
   const handleChange = (
     event: React.MouseEvent<HTMLElement>,
@@ -96,6 +94,7 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
 
   const { mutate: submitFormAd, isPending: isLoading } = useMutation({
     mutationFn: async () => {
+
       const startTimeString = watch('hourStart');
       const endTimeString = watch('hourEnd');
 
@@ -144,14 +143,20 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
     }
   })
 
+  const handleSubmitAd = handleSubmit(async () => {
+    if (!alignment.length) {
+      setEmptyDate(true);
+      return;
+    }
+    await submitFormAd();
+  })
+
   async function handleRefresh() {
     await queryClient.refetchQueries({ queryKey: ['subjects'] });
     await queryClient.refetchQueries({ queryKey: ['subjectAds', ad?.userId] });
     await queryClient.refetchQueries({ queryKey: ['subjectAds', subjectId] });
     await queryClient.refetchQueries({ queryKey: ['allAds'] });
   }
-
-
 
   return (
     <div>
@@ -183,6 +188,8 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
                 {...register('subjects')}
                 variant="standard"
                 required
+                error={Boolean(errors.subjects)}
+                helperText={errors.subjects?.message}
                 disabled={Boolean(ad?.id) || Boolean(subjectId)}
               >
                 {selectSubjects?.map((option) => (
@@ -207,6 +214,8 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
                 }
                 size="small"
                 required
+                error={Boolean(errors.name)}
+                helperText={errors.name?.message}
               />
 
               <TextField
@@ -224,6 +233,8 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
                 }
                 size="small"
                 required
+                error={Boolean(errors.linkCall)}
+                helperText={errors.linkCall?.message}
               />
 
               <Typography variant="body1" className='text-black' color={'GrayText'}>Quais os dias da semana ? *</Typography>
@@ -233,7 +244,7 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
                 value={alignment}
                 exclusive
                 onChange={handleChange}
-                aria-label="Platform"                
+                aria-label="Platform"              
               >
                 <ToggleButton value="SUNDAY" selected={alignment.includes('SUNDAY')}>D</ToggleButton>
                 <ToggleButton value="MONDAY" selected={alignment.includes('MONDAY')}>S</ToggleButton>
@@ -249,7 +260,13 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
                 <InputTime onChange={(e) => setValue('hourStart', e)} value={watch('hourStart')}/> 
                   <p className='text-gray-400'>-</p>
                 <InputTime onChange={(e) => setValue('hourEnd', e)} value={watch('hourEnd')}/> 
-              </div> 
+              </div>
+
+              {(Boolean(errors.hourStart) || Boolean(errors.hourEnd) || emptyDate) && (
+                <Alert variant="outlined" severity="error">
+                  Data não selecionada.
+                </Alert>
+              )}
 
               <FormGroup>
                 <FormControlLabel
@@ -280,7 +297,7 @@ export default function ModalFormAd({ open, ad, subjectId, subjects, handleClose
 
               <div style={{display: 'flex', gap: 16, alignContent: 'center', marginBottom: 32, justifyContent: 'flex-end' }}>
                 <Button variant="outlined" color="success" onClick={handleClose}>Cancelar</Button>
-                <Button variant="contained" color="success" onClick={() => submitFormAd()} disabled={isLoading} className='bg-green-500'>Publicar</Button>
+                <Button variant="contained" color="success" onClick={handleSubmitAd} disabled={isLoading} className='bg-green-500'>Publicar</Button>
               </div>           
             </div>
           </Box>

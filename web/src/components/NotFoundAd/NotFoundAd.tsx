@@ -6,7 +6,7 @@ import ModalFormAd from "../ModalFormAd/ModalFormAd";
 import { useStore } from "zustand";
 import { TSubjects } from "@/type/subject";
 
-export function NotFoundAd({ subjects, subjectId }: {subjects: TSubjects[], subjectId?: string}) {
+export function NotFoundAd({ subjects, subjectId, myAds }: {subjects: TSubjects[], subjectId?: string, myAds?: boolean}) {
   const isMobile = useScreenSize(688);
   const [openModal, setOpenModal] = useState(false);
   const authStore = useStore(useAuthStore);
@@ -16,7 +16,7 @@ export function NotFoundAd({ subjects, subjectId }: {subjects: TSubjects[], subj
     <Fragment>
       <div className={`w-full mx-auto mt-4 bg-zinc-200 py-4 px-3 flex ${isMobile && 'flex-col'} justify-between rounded-lg`}>
         <div className='flex flex-col'>
-          <Typography variant='h6' className='text-green-500 font-bold'>Não encontrou o seu parceiro?</Typography>
+          <Typography variant='h6' className='text-green-500 font-bold'>{myAds ? 'Nenhum anúncio publicado' : 'Não encontrou o seu grupo?'}</Typography>
           <Typography variant='subtitle2' className='text-zinc-400'>Publique um anúncio para encontrar novos estudantes</Typography>
         </div>
         

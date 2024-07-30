@@ -53,7 +53,7 @@ export default function AllAds() {
     if (!link) return
 
     navigator.clipboard.writeText(link);
-    snackbarContext.success('Link copiado!');
+    snackbarContext.success('Link para o encontro copiado!');
   }
 
 
@@ -73,7 +73,7 @@ export default function AllAds() {
                 <div className="flex justify-between">
                   <div className={`flex flex-col gap-1`}>
                     <Typography variant='body1'className='font-bold text-green-500'><b>{ad?.name}</b></Typography>
-                    <Typography variant='body1' className="text-zinc-700">Nome: <b>{ad.nameUser}</b></Typography>
+                    <Typography variant='body1' className="text-zinc-700">Criado por: <b>{ad.nameUser}</b></Typography>
                     <Typography variant='body1'className="text-zinc-700">Dias: <b>{weekDaysSelected(ad?.weekDay)}</b></Typography>
                     <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad?.hourStart, 'HH:mm')} - {format(ad?.hourEnd, 'HH:mm')}</b></Typography>
                     <div className="flex gap-1">  
@@ -110,7 +110,7 @@ export default function AllAds() {
                             className="bg-green-500"
                             onClick={() => conectedAd(ad.linkCall)}
                           >
-                            Conectar
+                            Encontro
                           </Button>
                         )}
                       </div>

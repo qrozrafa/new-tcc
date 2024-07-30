@@ -33,10 +33,10 @@ export default function ModalEditUser({open, user, handleClose}: TModalEditUser)
   const queryClient = useQueryClient();
 
   const editData = z.object({
-    name: z.string().min(4, 'Insira o seu nome'),
+    name: z.string().min(4, 'Insira o nome'),
     email: z.string().email('Insira um endereço de e-mail válido'),
-    cpf: z.string().min(11, 'Insira o seu CPF'),
-    ra: z.string().min(6, 'Insira o seu RA'),
+    cpf: z.string().min(11, 'Insira o CPF'),
+    ra: z.string().min(6, 'Insira o RA'),
     role: z.string().default('USER').optional(),
   });
 
@@ -75,6 +75,11 @@ export default function ModalEditUser({open, user, handleClose}: TModalEditUser)
       snackbarContext.error('Erro ao editar perfil');
     }
   })
+
+  const onSubmit = handleSubmit(() => {
+    handleRegister();
+  });
+
   return (
     <>
       <Modal
@@ -95,7 +100,7 @@ export default function ModalEditUser({open, user, handleClose}: TModalEditUser)
             <div style={{display: 'flex', flexDirection: 'column', gap: 32, margin: `32px 0 0`}}>
               <TextField
                 variant="standard"
-                placeholder="Digite seu nome"
+                placeholder="Digite o nome"
                 label="Nome:"
                 type="text"
                 color="success"
@@ -105,7 +110,8 @@ export default function ModalEditUser({open, user, handleClose}: TModalEditUser)
                     clearErrors('name')
                   }
                 }
-                error={!!errors.name}
+                error={Boolean(errors.name)}
+                helperText={errors.name?.message}
                 size="small"
                 required
                 autoFocus
@@ -113,7 +119,7 @@ export default function ModalEditUser({open, user, handleClose}: TModalEditUser)
               <TextField
                 variant="standard"
                 label="Email:"
-                placeholder="Digite seu email"
+                placeholder="Digite um email"
                 type="email"
                 color="success"
                 {...register('email')}
@@ -122,14 +128,15 @@ export default function ModalEditUser({open, user, handleClose}: TModalEditUser)
                     clearErrors('email')
                   }
                 }
-                error={!!errors.email}
+                error={Boolean(errors.email)}
+                helperText={errors.email?.message}
                 size="small"
                 required
               />
               <TextField
                 variant="standard"
                 label="CPF:"
-                placeholder="Digite seu CPF"
+                placeholder="Digite o CPF"
                 type="text"
                 color="success"
                 {...register('cpf')}
@@ -138,7 +145,8 @@ export default function ModalEditUser({open, user, handleClose}: TModalEditUser)
                     clearErrors('cpf')
                   }
                 }
-                error={!!errors.cpf}
+                error={Boolean(errors.cpf)}
+                helperText={errors.cpf?.message}
                 size="small"
                 required
                 inputProps={{ maxLength: 11 }}
@@ -146,7 +154,7 @@ export default function ModalEditUser({open, user, handleClose}: TModalEditUser)
               <TextField
                 variant="standard"
                 label="RA:"
-                placeholder="Digite seu RA"
+                placeholder="Digite o RA"
                 type="text"
                 color="success"
                 {...register('ra')}
@@ -155,14 +163,15 @@ export default function ModalEditUser({open, user, handleClose}: TModalEditUser)
                     clearErrors('ra')
                   }
                 }
-                error={!!errors.ra}
+                error={Boolean(errors.ra)}
+                helperText={errors.ra?.message}
                 size="small"
                 required
                 inputProps={{ maxLength: 6 }}
               />
                 <div style={{display: 'flex', gap: 16, alignContent: 'center', marginBottom: 32, justifyContent: 'flex-end' }}>
                   <Button variant="outlined" color="success" onClick={handleClose}>Cancelar</Button>
-                  <Button variant="contained" color="success" onClick={() => handleRegister()} disabled={isLoading} className='bg-green-500'>Salvar</Button>
+                  <Button variant="contained" color="success" onClick={onSubmit} disabled={isLoading} className='bg-green-500'>Salvar</Button>
                 </div>
             </div>
           </Box>

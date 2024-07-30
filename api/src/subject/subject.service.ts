@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserAdService } from 'src/user-ad/user-ad.service';
 import { UserService } from 'src/user/user.service';
 import { AdService } from 'src/ad/ad.service';
+import { UpdateSubjectDTO } from './dto/update-subject.dto';
 
 @Injectable()
 export class SubjectService {
@@ -141,7 +142,7 @@ export class SubjectService {
     return subject;
   }
 
-  async updateSubject(id: string, data: CreateSubjectDto) {
+  async updateSubject(id: string, data: UpdateSubjectDTO) {
     await this.exists(id);
     return await this.prisma.subject.update({
       where: {

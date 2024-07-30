@@ -1,5 +1,5 @@
 import api from "@/middleware/api";
-import { DataEditUser, DataRegisterUser } from "@/type/register";
+import { DataEditUser, DataRegisterUser, TResetPasswordUser} from "@/type/register";
 
 export async function getDataUserToken() {
   try {
@@ -24,6 +24,15 @@ export async function editDataUser(id?: string, data?: DataEditUser) {
     return response.data;
   } catch (error) {
     console.error('Erro durante a edição do perfil:', error);
+  }
+}
+
+export async function resetPasswordUser(data: TResetPasswordUser) {
+  try {
+    const response = await api.post(`/auth/reset`, data);
+    return response.data;
+  } catch (error) {
+    console.error('Erro durante o reset de senha:', error);
   }
 }
 

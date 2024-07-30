@@ -88,7 +88,7 @@ export default function Subject() {
     if (!link) return
 
     navigator.clipboard.writeText(link);
-    snackbarContext.success('Link copiado!');
+    snackbarContext.success('Link para o encontro copiado!');
   }
 
   return (
@@ -100,7 +100,7 @@ export default function Subject() {
       )}
       {!loadingSubject && !loadingSubjectAds && (
         <div className='flex flex-col gap-4 justify-center p-8'>
-          <Typography variant='h4' className='text-zinc-700 text-center font-bold'>Encontre seu colega de estudo em <span className='text-green-500 font-bold'>{subject?.name}</span></Typography>
+          <Typography variant='h4' className='text-zinc-700 text-center font-bold'>Encontre seu grupo de estudo em <span className='text-green-500 font-bold'>{subject?.name}</span></Typography>
 
           <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex justify-between rounded-lg`}>
             <TextField
@@ -127,7 +127,7 @@ export default function Subject() {
                   <div className="flex justify-between">
                     <div className={`flex flex-col gap-1`}>
                       <Typography variant='body1'className='font-bold text-green-500'><b>{ad.name}</b></Typography>
-                      <Typography variant='body1' className="text-zinc-700">Nome: <b>{ad.nameUser}</b></Typography>
+                      <Typography variant='body1' className="text-zinc-700">Criado por: <b>{ad.nameUser}</b></Typography>
                       <Typography variant='body1'className="text-zinc-700">Dias: <b>{weekDaysSelected(ad.weekDay)}</b></Typography>
                       <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad.hourStart, 'HH:mm')} - {format(ad.hourEnd, 'HH:mm')}</b></Typography>
                       <div className="flex gap-1">
@@ -164,7 +164,7 @@ export default function Subject() {
                             className="bg-green-500"
                             onClick={() => conectedAd(ad.linkCall)}
                           >
-                            Conectar
+                            encontro
                           </Button>
                         )}
                       </div>

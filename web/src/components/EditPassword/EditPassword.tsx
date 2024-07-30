@@ -32,7 +32,7 @@ export default function EditPassword() {
       .regex(/[a-z]/, 'A senha deve conter pelo menos uma letra minúscula')
       .regex(/[0-9]/, 'A senha deve conter pelo menos um número')
       .regex(/[^a-zA-Z0-9]/, 'A senha deve conter pelo menos um caractere especial'),
-    showPassword: z.boolean().default(false),
+    showPassword: z.boolean().default(false).optional(),
 
   });
 
@@ -70,15 +70,14 @@ export default function EditPassword() {
 
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-  };
+  }; 
+
+  const onSubmit = handleSubmit(() => {
+    handlePassword();
+  })
 
   return (
     <div className="w-[300px] flex flex-col justify-center gap-4 mx-auto">
-      {Object.keys(errors).length > 0 && (
-        Object.values(errors).map((item, index) => (
-          <Alert severity="error">{item.message}</Alert>
-        ))
-      )}
       <TextField
         id="outlined-size-small" 
         variant="standard"
@@ -92,7 +91,7 @@ export default function EditPassword() {
             clearErrors('currentPassword')
           }
         }
-        error={!!errors.currentPassword}
+        error={Boolean(errors.currentPassword)}
         size="small"
         InputProps={{
           endAdornment: (
@@ -108,7 +107,7 @@ export default function EditPassword() {
             </InputAdornment>
           )
         }}
-        helperText={!!errors.currentPassword?.message}
+        helperText={errors.currentPassword?.message}
       />
       <TextField
         id="outlined-size-small" 
@@ -123,7 +122,7 @@ export default function EditPassword() {
             clearErrors('newPassword')
           }
         }
-        error={!!errors.newPassword}
+        error={Boolean(errors.newPassword)}
         size="small"
         InputProps={{
           endAdornment: (
@@ -139,7 +138,7 @@ export default function EditPassword() {
             </InputAdornment>
           )
         }}
-        helperText={!!errors.newPassword?.message}
+        helperText={errors.newPassword?.message}
       />
 
       <div className='flex flex-col gap-4 justify-center'>
@@ -148,7 +147,7 @@ export default function EditPassword() {
           color="success"
           type="submit"
           fullWidth
-          onClick={() => handlePassword()}
+          onClick={onSubmit}
           size="small"
           className="bg-green-600"
           disabled={isLoading}

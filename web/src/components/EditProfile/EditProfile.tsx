@@ -1,19 +1,24 @@
 'use client'
 import { useForm } from "react-hook-form"
-import { Alert, Button, TextField } from '@mui/material'
+import { Button, IconButton, TextField } from '@mui/material'
 import { z } from 'zod'
-import { editDataUser } from "@/service/user"
+import { deleteImage, editDataUser, uploadImage } from "@/service/user"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useUserStore } from "@/store/user"
 import { useMutation } from "@tanstack/react-query"
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { SnackbarContext } from "@/context/snackbar.context"
+import Image from "next/image"
+import { AccountCircle, Delete } from "@mui/icons-material"
+import ModalUploadImage from "../ModalUploadImage/ModalUploadImage"
 
 export default function EditProfile() {
   const snackbarContext = useContext(SnackbarContext);
   const useUser = useUserStore();
 
   const { user } = useUser;
+
+  const [modalUploadImage, setModalUploadImage] = useState<boolean>(false);
 
   const editData = z.object({
     name: z.string().min(4, 'Insira o seu nome'),
@@ -64,9 +69,77 @@ export default function EditProfile() {
     handleRegister()
   })
 
+  const { mutate: submitImage } = useMutation({
+    mutationFn: async (file: File) => {
+
+      const resp = await uploadImage(user?.id, { file: file });
+
+      if(resp?.image) {
+        snackbarContext.success('Imagem alterada com sucesso!');
+        useUser.setUser(resp);
+      } else {
+        snackbarContext.error('Erro ao editar imagem');
+      }
+    }
+  })
+
+  async function handleRemoveImageSubject(user: string) {
+
+    const response = await deleteImage(user as string);
+
+    if (response) {
+      snackbarContext.success('Imagem removida com sucesso!');
+      useUser.setUser(response);
+    } else {
+      snackbarContext.error('Erro ao remover imagem');
+    }
+  }
 
   return (
     <div className="w-[300px] flex flex-col justify-center gap-4 mx-auto">
+      <div className="flex justify-start">
+        {user?.image ? (
+          <div className="flex items-center">
+            <Image
+              src={`${process.env.NEXT_PUBLIC_BASE_URL}/storage/user/${user.image}`}
+              alt="Imagem do perfil"
+              width={100}
+              height={100}
+              className="rounded-full"
+              unoptimized
+            />
+            <Button
+              variant="outlined"
+              color="success"
+              onClick={() => setModalUploadImage(true)}
+              size="small"
+              sx={{ ml: 1, height: 40 }}
+            >
+              Alterar imagem
+            </Button>
+            <IconButton
+              aria-label="delete"
+              color="error"
+              onClick={() => handleRemoveImageSubject(user.id)}
+            >
+              <Delete />
+            </IconButton>
+          </div>
+        ) : (
+          <div className="flex items-center">
+            <AccountCircle sx={{ color: 'rgb(22 163 74)', width: 100, height: 100 }} />
+            <Button
+              variant="outlined"
+              color="success"
+              onClick={() => setModalUploadImage(true)}
+              size="small"
+              sx={{ ml: 1, height: 40 }}
+            >
+              Adicionar imagem
+            </Button>
+          </div>
+        )}
+      </div>
       <TextField
         variant="standard"
         placeholder="Digite seu nome"
@@ -153,6 +226,17 @@ export default function EditProfile() {
           Salvar
         </Button>
       </div>
+
+      {modalUploadImage && (
+        <ModalUploadImage
+          open={modalUploadImage}
+          handleClose={() => setModalUploadImage(false)}
+          upgrade={user?.image ? true : false}
+          onSelectFile={(file: File) => {
+            submitImage(file);
+          }}
+        />
+      )}
     </div>
   )
 }

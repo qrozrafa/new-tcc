@@ -4,13 +4,14 @@ import { Divisor } from "@/styles/styles";
 import { TSubjects } from "@/type/subject";
 import { Edit, Visibility, VisibilityOff, Image as ImageIcon, HideImage } from "@mui/icons-material";
 import { Button, CircularProgress, IconButton, Tooltip, Typography } from "@mui/material";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useState } from "react";
 import ModalEditSubject from "../ModalEditSubject/ModalEditSubject";
 import Image from "next/image";
 
 import notImg from '../../../public/assets/images/No Image.png';
 import ModalUploadImage from "../ModalUploadImage/ModalUploadImage";
+import { uploadImage } from "@/service/subject";
 
 export default function ListSubjects() {
   const queryClient = useQueryClient();
@@ -60,6 +61,26 @@ export default function ListSubjects() {
       snackbarContext.error('Erro ao remover imagem');
     }
   }
+
+  async function handleRefresh() {
+    await queryClient.refetchQueries({ queryKey: ['subjects'] });
+    await queryClient.refetchQueries({ queryKey: ['allSubjects'] });
+  }
+
+  const { mutate: submitImage, isPending: isLoading } = useMutation({
+    mutationFn: async (file: File) => {
+
+      await uploadImage(subject?.id, { file: file });
+
+    },
+    onSuccess: async () => {
+      snackbarContext.success('Upload de imagem com sucesso!');
+      await handleRefresh();
+    },
+    onError: (data) => {
+      snackbarContext.error(data.message);
+    }
+  })
 
   return (
     <>
@@ -137,9 +158,9 @@ export default function ListSubjects() {
 
       {openModalEditImage && subject && (
         <ModalUploadImage
-          subject={subject}
           open={openModalEditImage}
           handleClose={() => setOpenModalEditImage(false)}
+          onSelectFile={(event: File) => submitImage(event)}
         />
       )}
 

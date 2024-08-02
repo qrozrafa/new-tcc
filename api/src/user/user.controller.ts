@@ -127,7 +127,7 @@ export class UserController {
         name: user.name,
         image: `image-${id}.png`,
       });
-      return { msg: 'Imagem alterada com sucesso' };
+      return await this.userService.getUserById(id);
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -153,7 +153,7 @@ export class UserController {
         name: user.name,
         image: null,
       });
-      return { msg: 'Imagem deletada com sucesso' };
+      return await this.userService.getUserById(id);
     } catch (error) {
       throw new BadRequestException(error);
     }

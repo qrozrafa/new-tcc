@@ -9,14 +9,13 @@ import { useAuthStore } from '@/store/auth';
 import { useUserStore } from '@/store/user';
 import ModalAccess from '../ModalAccess/ModalAccess';
 import { Fade, Menu, MenuItem } from '@mui/material';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useStore } from 'zustand';
 import Image from 'next/image';
 import Logo from '../../../public/assets/images/logo.png';
 
 export default function Nav() {
   const router = useRouter();
-  const pathname = usePathname()
   const [openModalAccess, setOpenModalAccess] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -65,7 +64,17 @@ export default function Nav() {
             >
               <span className='cursor-pointer'>{user?.name ?? 'Entrar'}</span>
             </Typography>
-            <AccountCircle sx={{ color: 'rgb(22 163 74)', ml: 1 }}/>
+            {user?.image ? (
+              <Image
+                src={`${process.env.NEXT_PUBLIC_BASE_URL}/storage/user/${user.image}`}
+                alt="profile"
+                width={26}
+                height={26}
+                className='rounded-full ml-2'
+              />
+            ): (
+              <AccountCircle sx={{ color: 'rgb(22 163 74)', ml: 1, width: 40, height: 40 }}/>
+            )}
           </div>
         </Toolbar>
       </AppBar>

@@ -1,14 +1,7 @@
-import { SnackbarContext } from "@/context/snackbar.context";
-import { editSubject, uploadImage } from "@/service/subject";
-import { TSubjects } from "@/type/subject";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, IconButton, Modal, TextField, Typography } from "@mui/material";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Box, Button, IconButton, Modal, Typography } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { useContext, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useRef, useState } from "react";
 import styled from "styled-components";
-import { z } from "zod";
 import { Delete } from "@mui/icons-material";
 
 const style = {
@@ -38,12 +31,11 @@ const VisuallyHiddenInput = styled('input')({
 
 type TModalEditSubject = {
   open: boolean;
-  subject: TSubjects;
+  upgrade?: boolean;
   handleClose: () => void;
+  onSelectFile: (event: File) => void;
 }
-export default function ModalUploadImage({open, subject, handleClose }: TModalEditSubject) {
-  const queryClient = useQueryClient();
-  const snackbarContext = useContext(SnackbarContext);
+export default function ModalUploadImage({open, upgrade, handleClose, onSelectFile }: TModalEditSubject) {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
 
@@ -60,26 +52,12 @@ export default function ModalUploadImage({open, subject, handleClose }: TModalEd
     }
   };
 
-  async function handleRefresh() {
-    await queryClient.refetchQueries({ queryKey: ['subjects'] });
-    await queryClient.refetchQueries({ queryKey: ['allSubjects'] });
-  }
-
-  const { mutate: submitImage, isPending: isLoading } = useMutation({
-    mutationFn: async () => {
-
-      await uploadImage(subject?.id, { file: file });
-
-    },
-    onSuccess: async () => {
-      snackbarContext.success('Upload de imagem com sucesso!');
-      await handleRefresh();
+  const handleSubmit = () => {
+    if (file) {
+      onSelectFile(file);
       handleClose();
-    },
-    onError: (data) => {
-      snackbarContext.error(data.message);
     }
-  })
+  };
 
   return (
     <>
@@ -95,47 +73,47 @@ export default function ModalUploadImage({open, subject, handleClose }: TModalEd
         <>
           <Box sx={style}>
             <Typography id="modal-modal-title" variant="h6" component="h2" className='text-green-500 mb-3'>
-              {subject?.image ? 'Alterar imagem' : 'Adicionar imagem'}
+              {upgrade ? 'Alterar imagem' : 'Adicionar imagem'}
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2 }} className="text-gray-600">
-              {subject?.image ? `Alterar a imagem para a disciplina ${subject?.name}` :  `Escolha uma imagem para a disciplina ${subject?.name}`}
+              {upgrade ? `Alterar a imagem` :  `Escolha uma imagem`}
             </Typography>
             <div style={{display: 'flex', flexDirection: 'column', gap: 32, margin: `32px 0 0`}}>
-            <div className="flex w-full items-center">
-              <Button
-                component="label"
-                role={undefined}
-                variant="outlined"
-                tabIndex={-1}
-                color="success"
-                className="w-full"
-                startIcon={<CloudUploadIcon />}
-              >
-                <VisuallyHiddenInput
-                type="file"
-                ref={hiddenFileInput}
-                onChange={handleChange}
-                hidden
-                />
-                <div className="file-name">
-                  {file ? <div>{file?.name}</div> : <div>{subject.image ? 'Alterar imagem' : 'Selecionar imagem'}</div>}
-                </div>
-              </Button>
-              <div>
-                <IconButton
-                  aria-label="delete"
-                  disabled={!file}
-                  color="error"
-                  onClick={onDeleteFileHandler}
+              <div className="flex w-full items-center">
+                <Button
+                  component="label"
+                  role={undefined}
+                  variant="outlined"
+                  tabIndex={-1}
+                  color="success"
+                  className="w-full"
+                  startIcon={<CloudUploadIcon />}
                 >
-                  <Delete />
-                </IconButton>
-              </div>
-            </div>
-                <div style={{display: 'flex', gap: 16, alignContent: 'center', marginBottom: 32, justifyContent: 'flex-end' }}>
-                  <Button variant="outlined" color="success" onClick={handleClose}>Cancelar</Button>
-                  <Button variant="contained" color="success" onClick={() => submitImage()} disabled={isLoading || !file} className='bg-green-500'>Salvar</Button>
+                  <VisuallyHiddenInput
+                  type="file"
+                  ref={hiddenFileInput}
+                  onChange={handleChange}
+                  hidden
+                  />
+                  <div className="file-name">
+                    {file ? <div>{file?.name}</div> : <div>{upgrade ? 'Alterar imagem' : 'Selecionar imagem'}</div>}
+                  </div>
+                </Button>
+                <div>
+                  <IconButton
+                    aria-label="delete"
+                    disabled={!file}
+                    color="error"
+                    onClick={onDeleteFileHandler}
+                  >
+                    <Delete />
+                  </IconButton>
                 </div>
+              </div>
+              <div style={{display: 'flex', gap: 16, alignContent: 'center', marginBottom: 32, justifyContent: 'flex-end' }}>
+                <Button variant="outlined" color="success" onClick={handleClose}>Cancelar</Button>
+                <Button variant="contained" color="success" onClick={handleSubmit} disabled={!file} className='bg-green-500'>Salvar</Button>
+              </div>
             </div>
           </Box>
         </>

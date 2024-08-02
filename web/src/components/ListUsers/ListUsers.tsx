@@ -2,12 +2,13 @@ import { SnackbarContext } from "@/context/snackbar.context";
 import { activeUser, disableUser, getUsers } from "@/service/user";
 import { UserData } from "@/store/user";
 import { Divisor } from "@/styles/styles";
-import { Edit, Visibility, VisibilityOff } from "@mui/icons-material";
+import { AccountCircle, Edit, Visibility, VisibilityOff } from "@mui/icons-material";
 import { CircularProgress, IconButton, Tooltip, Typography } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useContext, useState } from "react";
 import ModalEditUser from "../ModalEditUser/ModalEditUser";
+import Image from "next/image";
 
 export default function ListUsers() {
   const queryClient = useQueryClient();
@@ -54,9 +55,22 @@ export default function ListUsers() {
             {users?.map(user => (
               <>
                 <div className="flex justify-between">
-                  <div className={`flex flex-col`}>
-                    <Typography variant='body1'className='font-bold text-green-500'><b>{user.name}</b></Typography>
-                    <Typography variant='body2'className="text-zinc-400">{format(new Date(user.createdAt), 'dd/MM/yyyy')}</Typography>
+                  <div className="flex items-center gap-2">
+                    {user?.image ? (
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_BASE_URL}/storage/user/${user.image}`}
+                        alt="profile"
+                        width={40}
+                        height={40}
+                        style={{ borderRadius: '50%', marginLeft: 4 }}
+                    />
+                    ) : (
+                      <AccountCircle sx={{ color: 'rgb(22 163 74)', ml: 1, width: 40, height: 40 }}/>
+                    )}
+                    <div className={`flex flex-col`}>
+                      <Typography variant='body1'className='font-bold text-green-500'><b>{user.name}</b></Typography>
+                      <Typography variant='body2'className="text-zinc-400">{format(new Date(user.createdAt), 'dd/MM/yyyy')}</Typography>
+                    </div>
                   </div>
                   <div className={`flex gap-2 self-start`}>
                     <Tooltip title="Editar usuario">

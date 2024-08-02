@@ -70,7 +70,7 @@ export async function createSubject(data: any) {
   }
 }
 
-export async function uploadImage(subjectId: string, data: any) {
+export async function uploadImage(subjectId?: string, data?: any) {
   try {
     const response = await api.post(`/subjects/image/${subjectId}`, data, {
       headers: {

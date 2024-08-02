@@ -62,3 +62,26 @@ export async function activeUser(userId: string) {
     console.error('Erro ao ativar usuario:', error);
   }
 }
+
+export async function uploadImage(userId?: string, data?: any) {
+  try {
+    const response = await api.post(`/users/image/${userId}`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao ativar usuario:', error);
+  }
+}
+
+export async function deleteImage(userId: string) {
+  try {
+    const response = await api.delete(`/users/image/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao ativar usuario:', error);
+  }
+}

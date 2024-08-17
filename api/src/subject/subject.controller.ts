@@ -55,6 +55,11 @@ export class SubjectController {
     return this.subjectService.listSubjectAds(id);
   }
 
+  @Get('ads/last/:id')
+  async getLastSubjectAds(@Param('id', ParseUUIDPipe) id: string) {
+    return this.subjectService.listLastSubjectAds(id);
+  }
+
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)
   @Put(':id')

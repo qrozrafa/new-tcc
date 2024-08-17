@@ -110,7 +110,7 @@ export default function AllAds() {
                             className="bg-green-500"
                             onClick={() => conectedAd(ad.linkCall)}
                           >
-                            Encontro
+                            Copiar link
                           </Button>
                         )}
                       </div>

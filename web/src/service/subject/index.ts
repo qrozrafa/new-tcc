@@ -18,9 +18,9 @@ export async function getAllSubjects() {
   }
 }
 
-export async function getSubjectAds(subjectId: string) {
+export async function getSubjectAds(subjectId: string, filter?: boolean) {
   try {
-    const response = await api.get(`/subjects/ads/${subjectId}`);
+    const response = await api.get(`/subjects/ads/${filter ? 'last/' : ''}${subjectId}`);
     return response.data;
   } catch (error) {
     console.error('Erro carregar os ads de subject:', error);

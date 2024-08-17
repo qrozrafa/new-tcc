@@ -80,22 +80,67 @@ export class SubjectService {
     const subjectAds = await this.userAdService.getSubjectAds(subjectId);
 
     if (subjectAds) {
-      const detailsUserAndAds = await Promise.all(
-        subjectAds.map(async (subjectAd) => {
-          const detailUser = await this.userService.getUserById(
-            subjectAd.userId,
-          );
-          const detailAd = await this.adService.getAdById(subjectAd.adId);
+      const detailsUserAndAds = (
+        await Promise.all(
+          subjectAds.map(async (subjectAd) => {
+            const detailUser = await this.userService.getUserById(
+              subjectAd.userId,
+            );
+            const detailAd = await this.adService.getAdById(subjectAd.adId);
 
-          const { name: nameUser, id } = detailUser;
-          return {
-            nameUser,
-            userId: id,
-            ...subjectAd,
-            ...detailAd,
-          };
-        }),
-      );
+            const { name: nameUser, id } = detailUser;
+            return {
+              nameUser,
+              userId: id,
+              ...subjectAd,
+              ...detailAd,
+            };
+          }),
+        )
+      ).sort((a, b) => {
+        if (a.createdAt < b.createdAt) {
+          return 1;
+        }
+        if (a.createdAt > b.createdAt) {
+          return -1;
+        }
+        return 0;
+      });
+
+      return detailsUserAndAds;
+    }
+  }
+
+  async listLastSubjectAds(subjectId: string) {
+    const subjectAds = await this.userAdService.getSubjectAds(subjectId);
+
+    if (subjectAds) {
+      const detailsUserAndAds = (
+        await Promise.all(
+          subjectAds.map(async (subjectAd) => {
+            const detailUser = await this.userService.getUserById(
+              subjectAd.userId,
+            );
+            const detailAd = await this.adService.getAdById(subjectAd.adId);
+
+            const { name: nameUser, id } = detailUser;
+            return {
+              nameUser,
+              userId: id,
+              ...subjectAd,
+              ...detailAd,
+            };
+          }),
+        )
+      ).sort((a, b) => {
+        if (a.createdAt < b.createdAt) {
+          return -1;
+        }
+        if (a.createdAt > b.createdAt) {
+          return 1;
+        }
+        return 0;
+      });
 
       return detailsUserAndAds;
     }

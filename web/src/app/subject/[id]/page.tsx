@@ -5,8 +5,8 @@ import { Divisor } from "@/styles/styles";
 import { DetailAd } from "@/type/ads";
 import { TSubjects } from "@/type/subject";
 import { weekDays } from "@/utils/constants";
-import { Delete, Edit, Mic, Search, VideoCameraFront } from "@mui/icons-material";
-import { Button, CircularProgress, IconButton, TextField, Tooltip, Typography } from "@mui/material";
+import { Delete, Edit, FilterList, FilterListOff, Mic, Search, VideoCameraFront } from "@mui/icons-material";
+import { Button, CircularProgress, IconButton, Pagination, TextField, Tooltip, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { format } from 'date-fns';
@@ -32,7 +32,10 @@ export default function Subject() {
   const [ads, setAds] = useState<DetailAd[]>([]);
   const [openModalDeleteAd, setOpenModalDeleteAd] = useState<boolean>(false);
   const [openModalEditAd, setOpenModalEditAd] = useState<boolean>(false);
+  const [filterLastAds, setFilterLastAds] = useState<boolean>(false);
   const [adSelected, setAdSelected] = useState<DetailAd>();
+  const [currentPage, setCurrentPage] = useState<Number | any>(1);
+  const [postsPerPage] = useState<Number | any>(6);
   const { authenticated } = authStore;
   const { subjects } = subjectsStore;
   const { user } = userStore;
@@ -50,7 +53,7 @@ export default function Subject() {
   const {isFetching: loadingSubjectAds, refetch } = useQuery<DetailAd[]>({
     queryKey: ['subjectAds', param.id as string],
     queryFn: async () => {
-      const resp =  await getSubjectAds(param.id as string);
+      const resp =  await getSubjectAds(param.id as string, filterLastAds);
       await setAds(resp)
       return []
     },
@@ -71,7 +74,14 @@ export default function Subject() {
   }
   
   const filteredAds = ads?.filter(ad => {
-    return ad.nameAd.toLowerCase().includes(search.toLowerCase())
+    const foundAd = ad.nameAd.toLowerCase().includes(search.toLowerCase());
+    const foundCreator = ad.nameUser.toLowerCase().includes(search.toLowerCase());
+    
+    if (foundAd) {
+      return foundAd;
+    } else if (foundCreator) {
+      return foundCreator;
+    }
   })
   
   async function handleDeleteAd(ad: DetailAd) {
@@ -91,6 +101,14 @@ export default function Subject() {
     snackbarContext.success('Link para o encontro copiado!');
   }
 
+  function paginate(pageNumber: any): void {
+    return setCurrentPage(pageNumber);
+  }
+
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = filteredAds.slice(indexOfFirstPost, indexOfLastPost);
+
   return (
     <Layout>
       {loadingSubjectAds || loadingSubject && (
@@ -106,7 +124,7 @@ export default function Subject() {
             <TextField
               variant="standard"
               color="success"
-              placeholder="Digita a matéria"
+              placeholder="Digita a matéria ou criador"
               className="w-full border-none"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -120,9 +138,24 @@ export default function Subject() {
             <NotFoundAd subjects={subjects} subjectId={param.id as string}/>
           )}
 
-          {filteredAds?.length > 0 && (
+          {currentPosts?.length > 0 && (
             <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex flex-col justify-between rounded-lg`}>
-              {filteredAds?.map(ad => (
+              <div className="flex self-end items-center">
+                <Button
+                  variant="text"
+                  color="success"
+                  onClick={
+                    async () => {
+                      await setFilterLastAds(!filterLastAds);
+                      refetch()
+                      }
+                    }
+                  >
+                  <Typography variant="body1" className="text-zinc-400">{filterLastAds ? 'Mais recente' : 'Mais antigo'}</Typography>
+                  {filterLastAds ? <FilterListOff color="disabled"/> : <FilterList color="disabled"/>}
+                </Button>                
+              </div>
+              {currentPosts?.map(ad => (
                 <>
                   <div className="flex justify-between">
                     <div className={`flex flex-col gap-1`}>
@@ -130,6 +163,7 @@ export default function Subject() {
                       <Typography variant='body1' className="text-zinc-700">Criado por: <b>{ad.nameUser}</b></Typography>
                       <Typography variant='body1'className="text-zinc-700">Dias: <b>{weekDaysSelected(ad.weekDay)}</b></Typography>
                       <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad.hourStart, 'HH:mm')} - {format(ad.hourEnd, 'HH:mm')}</b></Typography>
+                      <Typography variant='body1' className="text-zinc-700">Criado em: <b>{format(ad.createdAt, 'dd/MM/yyyy')}</b></Typography>
                       <div className="flex gap-1">
                       <Tooltip title={ad.useVoice ? "Microfone disponível" : "Microfone indisponível"}>
                         <Mic className={`${ad.useVoice ? 'text-green-500' : 'text-gray-300'}`} />
@@ -164,7 +198,7 @@ export default function Subject() {
                             className="bg-green-500"
                             onClick={() => conectedAd(ad.linkCall)}
                           >
-                            encontro
+                            Copiar link
                           </Button>
                         )}
                       </div>
@@ -173,6 +207,21 @@ export default function Subject() {
                   <Divisor />
                 </>
               ))}
+              {filteredAds?.length > postsPerPage && (
+                <div className={`w-full mx-auto mt-4 flex justify-center `}>
+                  <Pagination 
+                    count={Math.ceil(filteredAds.length / postsPerPage)}
+                    color="standard"
+                    variant="outlined"
+                    shape="rounded"
+                    // showFirstButton={true}
+                    // showLastButton={true}
+                    hideNextButton={true}
+                    hidePrevButton={true}
+                    onChange={(e, value) => paginate(value)}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

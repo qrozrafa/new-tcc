@@ -65,7 +65,7 @@ export async function activeUser(userId: string) {
 
 export async function uploadImage(userId?: string, data?: any) {
   try {
-    const response = await api.post(`/users/image/${userId}`, data, {
+    const response = await api.post(`/users/${userId}/image`, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -79,7 +79,7 @@ export async function uploadImage(userId?: string, data?: any) {
 
 export async function deleteImage(userId: string) {
   try {
-    const response = await api.delete(`/users/image/${userId}`);
+    const response = await api.delete(`/users/${userId}/image`);
     return response.data;
   } catch (error) {
     console.error('Erro ao ativar usuario:', error);

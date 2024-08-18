@@ -2,8 +2,8 @@ import { SnackbarContext } from "@/context/snackbar.context";
 import { activeUser, disableUser, getUsers } from "@/service/user";
 import { UserData } from "@/store/user";
 import { Divisor } from "@/styles/styles";
-import { AccountCircle, Edit, Visibility, VisibilityOff } from "@mui/icons-material";
-import { CircularProgress, IconButton, Tooltip, Typography } from "@mui/material";
+import { AccountCircle, Edit, Search, Visibility, VisibilityOff } from "@mui/icons-material";
+import { CircularProgress, IconButton, Pagination, TextField, Tooltip, Typography } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useContext, useState } from "react";
@@ -14,7 +14,10 @@ export default function ListUsers() {
   const queryClient = useQueryClient();
   const snackbarContext = useContext(SnackbarContext);
 
+  const [search, setSearch] = useState<string>('');
   const [openModalEditUser, setOpenModalEditUser] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<Number | any>(1);
+  const [usersPerPage] = useState<Number | any>(6);
   const [selectedUser, setSelectedUser] = useState<UserData>();
 
 
@@ -41,6 +44,18 @@ export default function ListUsers() {
     setOpenModalEditUser(true);
   }
 
+  const filteredUsers = users?.filter(user => {
+    return user.name.toLowerCase().includes(search.toLowerCase());
+  })
+
+  function paginate(pageNumber: any): void {
+    return setCurrentPage(pageNumber);
+  }
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers?.slice(indexOfFirstUser, indexOfLastUser);
+
   return (
     <>
       {loadingUsers  && (
@@ -48,11 +63,27 @@ export default function ListUsers() {
           <CircularProgress color="success" />
         </div>
       )}
-      {!loadingUsers && users && (
+      {!loadingUsers && currentUsers && filteredUsers &&(
         <>
-          {users?.length > 0 && (
+          <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex justify-between rounded-lg`}>
+            <TextField
+              variant="standard"
+              color="success"
+              placeholder="Digita o usuário"
+              className="w-full border-none"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />            
+            <div className={`self-center`}>
+              <Search color="success"/>
+            </div>
+          </div>
+          {currentUsers?.length === 0 && (
+            <Typography variant="body1" className="text-zinc-400 text-center">Nenhum usuário encontrado</Typography>
+          )}
+          {currentUsers?.length > 0 && (
           <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex flex-col justify-between rounded-lg`}>
-            {users?.map(user => (
+            {currentUsers?.map(user => (
               <>
                 <div className="flex justify-between">
                   <div className="flex items-center gap-2">
@@ -90,6 +121,21 @@ export default function ListUsers() {
             ))}
           </div>
         )}
+          {filteredUsers?.length > usersPerPage && (
+            <div className={`w-full mx-auto mt-4 flex justify-center `}>
+              <Pagination 
+                count={Math.ceil(filteredUsers.length / usersPerPage)}
+                color="standard"
+                variant="outlined"
+                shape="rounded"
+                // showFirstButton={true}
+                // showLastButton={true}
+                hideNextButton={true}
+                hidePrevButton={true}
+                onChange={(e, value) => paginate(value)}
+              />
+            </div>
+          )}
         </>
       )}
 

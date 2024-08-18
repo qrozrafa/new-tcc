@@ -2,8 +2,8 @@ import { SnackbarContext } from "@/context/snackbar.context";
 import { activeSubject, deleteImage, disableSubject, getAllSubjects } from "@/service/subject";
 import { Divisor } from "@/styles/styles";
 import { TSubjects } from "@/type/subject";
-import { Edit, Visibility, VisibilityOff, Image as ImageIcon, HideImage } from "@mui/icons-material";
-import { Button, CircularProgress, IconButton, Tooltip, Typography } from "@mui/material";
+import { Edit, Visibility, VisibilityOff, Image as ImageIcon, HideImage, Search } from "@mui/icons-material";
+import { Button, CircularProgress, IconButton, Pagination, TextField, Tooltip, Typography } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useState } from "react";
 import ModalEditSubject from "../ModalEditSubject/ModalEditSubject";
@@ -18,6 +18,9 @@ export default function ListSubjects() {
   const snackbarContext = useContext(SnackbarContext);
   const [openModalEditSubject, setOpenModalEditSubject] = useState<boolean>(false);
   const [openModalEditImage, setOpenModalEditImage] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<Number | any>(1);
+  const [subjectsPerPage] = useState<Number | any>(6);
+  const [search, setSearch] = useState<string>('');
   const [subject, setSubject] = useState<TSubjects>();
 
   const { data: subjects, isFetching: loadingSubjects } = useQuery<TSubjects[]>({
@@ -80,7 +83,19 @@ export default function ListSubjects() {
     onError: (data) => {
       snackbarContext.error(data.message);
     }
+  });
+
+  const filteredSubject = subjects?.filter(subject => {
+    return subject.name.toLowerCase().includes(search.toLowerCase());
   })
+
+  function paginate(pageNumber: any): void {
+    return setCurrentPage(pageNumber);
+  }
+
+  const indexOfLastSubject = currentPage * subjectsPerPage;
+  const indexOfFirstUSubject = indexOfLastSubject - subjectsPerPage;
+  const currentSubjects = filteredSubject?.slice(indexOfFirstUSubject, indexOfLastSubject);
 
   return (
     <>
@@ -89,8 +104,23 @@ export default function ListSubjects() {
           <CircularProgress color="success" />
         </div>
       )}
-      {!loadingSubjects && subjects && (
+      {!loadingSubjects && currentSubjects && filteredSubject && 
+      (
         <>
+          <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex justify-between rounded-lg`}>
+            <TextField
+              variant="standard"
+              color="success"
+              placeholder="Digita a diciplina que procura"
+              className="w-full border-none"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />            
+            <div className={`self-center`}>
+              <Search color="success"/>
+            </div>
+          </div>
+
           <div className="flex justify-end w-full">
             <Button
               variant='contained'
@@ -103,9 +133,14 @@ export default function ListSubjects() {
               Adicionar diciplina
             </Button>
           </div>
-          {subjects?.length > 0 && (
+
+          {currentSubjects?.length === 0 && (
+            <Typography variant="body1" className="text-zinc-400 text-center">Nenhuma diciplina encontrada</Typography>
+          )}
+
+          {currentSubjects?.length > 0 && (
           <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex flex-col justify-between rounded-lg`}>
-            {subjects?.map(subject => (
+            {currentSubjects?.map(subject => (
               <>
                 <div className="flex justify-between flex-wrap">
                   <div className={`flex gap-2 items-center`}>
@@ -145,6 +180,21 @@ export default function ListSubjects() {
             ))}
           </div>
         )}
+          {filteredSubject?.length > subjectsPerPage && (
+            <div className={`w-full mx-auto mt-4 flex justify-center `}>
+              <Pagination
+                count={Math.ceil(filteredSubject.length / subjectsPerPage)}
+                color="standard"
+                variant="outlined"
+                shape="rounded"
+                // showFirstButton={true}
+                // showLastButton={true}
+                hideNextButton={true}
+                hidePrevButton={true}
+                onChange={(e, value) => paginate(value)}
+              />
+            </div>
+          )}
         </>
       )}
 

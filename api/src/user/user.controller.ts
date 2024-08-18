@@ -104,9 +104,8 @@ export class UserController {
   }
 
   @UseInterceptors(FileInterceptor('file'))
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(Role.ADMIN)
-  @Post('image/:id')
+  @Roles(Role.ADMIN, Role.USER)
+  @Post(':id/image')
   async uploadImage(
     @Param('id', ParseUUIDPipe) id: string,
     @UploadedFile() file: Express.Multer.File,
@@ -133,9 +132,8 @@ export class UserController {
     }
   }
 
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(Role.ADMIN)
-  @Delete('image/:id')
+  @Roles(Role.ADMIN, Role.USER)
+  @Delete(':id/image')
   async deleteImage(@Param('id', ParseUUIDPipe) id: string) {
     const user = await this.userService.getUserById(id);
     const path = join(

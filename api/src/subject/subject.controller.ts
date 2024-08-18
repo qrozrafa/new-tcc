@@ -91,6 +91,13 @@ export class SubjectController {
     return this.subjectService.getAllAdsByAllUsersEndSubjects();
   }
 
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(Role.ADMIN)
+  @Get('all/ads/last')
+  async getAllLastAdsByAllUsersEndSubjects() {
+    return this.subjectService.getAllLastAdsByAllUsersEndSubjects();
+  }
+
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(Role.ADMIN)

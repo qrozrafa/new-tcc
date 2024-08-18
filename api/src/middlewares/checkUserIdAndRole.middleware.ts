@@ -25,9 +25,6 @@ export class CheckUserIdAndRoleMiddleware implements NestMiddleware {
       return next();
     }
 
-    console.log(userIdToUpdate);
-    console.log(userIdFromToken);
-
     if (userIdFromToken !== userIdToUpdate) {
       return res
         .status(403)

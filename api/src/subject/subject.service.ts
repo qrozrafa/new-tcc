@@ -253,6 +253,71 @@ export class SubjectService {
       return subjects.map((subject) => {
         const user = fitUsers.find((user) => user.id === subject.userId);
         return { ...subject, nameUser: user.nameUser };
+      }).sort((a, b) => {
+        if (a.createdAt < b.createdAt) {
+          return 1;
+        }
+        if (a.createdAt > b.createdAt) {
+          return -1;
+        }
+        return 0;
+      });;
+    }
+    return [];
+  }
+
+  async getAllLastAdsByAllUsersEndSubjects() {
+    const listUsersAds = await this.userAdService.getUsersAds();
+
+    const fitUsersAds = listUsersAds.map((userAd) => {
+      return {
+        ...userAd,
+        userAdId: userAd.id,
+      };
+    });
+
+    if (fitUsersAds) {
+      const listUsers = await this.prisma.user.findMany();
+
+      const fitUsers = listUsers.map((user) => {
+        return {
+          ...user,
+          nameUser: user.name,
+        };
+      });
+
+      const listAds = await this.prisma.ad.findMany({
+        where: { status: 'ACTIVE' },
+      });
+
+      const ads = fitUsersAds.map((userAd) => {
+        const ad = listAds.find((ad) => ad.id === userAd.adId);
+        return {
+          ...userAd,
+          ...ad,
+        };
+      });
+
+      const listSubjects = await this.prisma.subject.findMany({
+        where: { status: 'ACTIVE' },
+      });
+
+      const subjects = ads.map((ad) => {
+        const subject = listSubjects.find((subject) => subject.id === ad.id);
+        return { ...ad, ...subject };
+      });
+
+      return subjects.map((subject) => {
+        const user = fitUsers.find((user) => user.id === subject.userId);
+        return { ...subject, nameUser: user.nameUser };
+      }).sort((a, b) => {
+        if (a.createdAt < b.createdAt) {
+          return -1;
+        }
+        if (a.createdAt > b.createdAt) {
+          return 1;
+        }
+        return 0;
       });
     }
     return [];

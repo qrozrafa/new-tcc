@@ -43,6 +43,10 @@ export class AdController {
   async getAdsByUserId(@Param() userId: string) {
     return this.adService.getAdsByUserId(userId);
   }
+  @Get('/user/:id/last')
+  async getLastAdsByUserId(@Param() userId: string) {
+    return this.adService.getLastAdsByUserId(userId);
+  }
 
   @Delete(':id')
   async deleteAd(@Param() id: string) {

@@ -250,18 +250,20 @@ export class SubjectService {
         return { ...ad, ...subject };
       });
 
-      return subjects.map((subject) => {
-        const user = fitUsers.find((user) => user.id === subject.userId);
-        return { ...subject, nameUser: user.nameUser };
-      }).sort((a, b) => {
-        if (a.createdAt < b.createdAt) {
-          return 1;
-        }
-        if (a.createdAt > b.createdAt) {
-          return -1;
-        }
-        return 0;
-      });;
+      return subjects
+        .map((subject) => {
+          const user = fitUsers.find((user) => user.id === subject.userId);
+          return { ...subject, nameUser: user.nameUser };
+        })
+        .sort((a, b) => {
+          if (a.createdAt < b.createdAt) {
+            return 1;
+          }
+          if (a.createdAt > b.createdAt) {
+            return -1;
+          }
+          return 0;
+        });
     }
     return [];
   }
@@ -307,18 +309,20 @@ export class SubjectService {
         return { ...ad, ...subject };
       });
 
-      return subjects.map((subject) => {
-        const user = fitUsers.find((user) => user.id === subject.userId);
-        return { ...subject, nameUser: user.nameUser };
-      }).sort((a, b) => {
-        if (a.createdAt < b.createdAt) {
-          return -1;
-        }
-        if (a.createdAt > b.createdAt) {
-          return 1;
-        }
-        return 0;
-      });
+      return subjects
+        .map((subject) => {
+          const user = fitUsers.find((user) => user.id === subject.userId);
+          return { ...subject, nameUser: user.nameUser };
+        })
+        .sort((a, b) => {
+          if (a.createdAt < b.createdAt) {
+            return -1;
+          }
+          if (a.createdAt > b.createdAt) {
+            return 1;
+          }
+          return 0;
+        });
     }
     return [];
   }

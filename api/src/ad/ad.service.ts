@@ -101,7 +101,44 @@ export class AdService {
       return { ...ad, ...userAds };
     });
 
-    return listUserAds;
+    return listUserAds.sort((a, b) => {
+      if (a.createdAt < b.createdAt) {
+        return 1;
+      }
+      if (a.createdAt > b.createdAt) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+
+  async getLastAdsByUserId(userId: any) {
+    const ads = await this.prismaService.ad.findMany({
+      where: {
+        status: 'ACTIVE',
+      },
+    });
+    const userAd = await this.prismaService.userAd.findMany({
+      where: {
+        userId: userId.id,
+        status: 'ACTIVE',
+      },
+    });
+
+    const listUserAds = userAd.map((ad) => {
+      const userAds = ads.find((userAd) => userAd.id === ad.adId);
+      return { ...ad, ...userAds };
+    });
+
+    return listUserAds.sort((a, b) => {
+      if (a.createdAt < b.createdAt) {
+        return -1;
+      }
+      if (a.createdAt > b.createdAt) {
+        return 1;
+      }
+      return 0;
+    });
   }
 
   async deleteAd(id: any) {

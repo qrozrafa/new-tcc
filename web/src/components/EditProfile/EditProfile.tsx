@@ -10,7 +10,7 @@ import { useContext, useState } from "react"
 import { SnackbarContext } from "@/context/snackbar.context"
 import Image from "next/image"
 import { AccountCircle, Delete } from "@mui/icons-material"
-import ModalUploadImage from "../ModalUploadImage/ModalUploadImage"
+import ModalUploadImage from "../Modais/ModalUploadImage/ModalUploadImage"
 
 export default function EditProfile() {
   const snackbarContext = useContext(SnackbarContext);

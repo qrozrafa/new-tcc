@@ -3,9 +3,9 @@ import Modal from '@mui/material/Modal';
 import { useState } from 'react';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { LockReset, Login as LoginIcon, PersonAddAlt1 } from '@mui/icons-material';
-import Register from '../Register/Register';
-import Login from '../Login/Login';
-import Forgot from '../Forgot/Forgot';
+import Register from '../../Register/Register';
+import Login from '../../Login/Login';
+import Forgot from '../../Forgot/Forgot';
 
 const style = {
   position: 'absolute' as 'absolute',

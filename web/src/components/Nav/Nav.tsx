@@ -7,7 +7,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth';
 import { useUserStore } from '@/store/user';
-import ModalAccess from '../ModalAccess/ModalAccess';
+import ModalAccess from '../Modais/ModalAccess/ModalAccess';
 import { Fade, Menu, MenuItem } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';

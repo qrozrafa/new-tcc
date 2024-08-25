@@ -10,7 +10,7 @@ import { useStore } from "zustand";
 import DeleteAd from "../DeleteAd/DeleteAd";
 import { useState } from "react";
 import { weekDaysSelected } from "@/utils/utils";
-import ModalFormAd from "../ModalFormAd/ModalFormAd";
+import ModalFormAd from "../Modais/ModalFormAd/ModalFormAd";
 import { TSubjects } from "@/type/subject";
 import { useSubjectsStore } from "@/store/subjects";
 import { NotFoundAd } from "../NotFoundAd/NotFoundAd";

@@ -6,11 +6,11 @@ import { Edit, Visibility, VisibilityOff, Image as ImageIcon, HideImage, Search 
 import { Button, CircularProgress, IconButton, Pagination, TextField, Tooltip, Typography } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useState } from "react";
-import ModalEditSubject from "../ModalEditSubject/ModalEditSubject";
+import ModalEditSubject from "../Modais/ModalEditSubject/ModalEditSubject";
 import Image from "next/image";
 
 import notImg from '../../../public/assets/images/No Image.png';
-import ModalUploadImage from "../ModalUploadImage/ModalUploadImage";
+import ModalUploadImage from "../Modais/ModalUploadImage/ModalUploadImage";
 import { uploadImage } from "@/service/subject";
 
 export default function ListSubjects() {

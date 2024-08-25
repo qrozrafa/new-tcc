@@ -11,7 +11,7 @@ import { useContext, useState } from "react";
 import { NotFoundAd } from "@/components/NotFoundAd/NotFoundAd";
 import { useStore } from "zustand";
 import DeleteAd from "@/components/DeleteAd/DeleteAd";
-import ModalFormAd from "@/components/ModalFormAd/ModalFormAd";
+import ModalFormAd from "@/components/Modais/ModalFormAd/ModalFormAd";
 import { useSubjectsStore } from "@/store/subjects";
 import { SnackbarContext } from "@/context/snackbar.context";
 import { CardAd } from "@/components/CardAd/CardAd";

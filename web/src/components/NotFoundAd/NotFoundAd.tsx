@@ -3,7 +3,7 @@ import { useAuthStore } from "@/store/auth";
 import useScreenSize from "@/utils/resize";
 import { Button, Typography } from "@mui/material";
 import { Fragment, useState } from "react";
-import ModalFormAd from "../ModalFormAd/ModalFormAd";
+import ModalFormAd from "../Modais/ModalFormAd/ModalFormAd";
 import { useStore } from "zustand";
 import { TSubjects } from "@/type/subject";
 import { useSubjectsStore } from "@/store/subjects";

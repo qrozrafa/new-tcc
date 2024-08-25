@@ -3,11 +3,11 @@ import { activeUser, disableUser, getUsers } from "@/service/user";
 import { UserData } from "@/store/user";
 import { Divisor } from "@/styles/styles";
 import { AccountCircle, Edit, Search, Visibility, VisibilityOff } from "@mui/icons-material";
-import { CircularProgress, IconButton, Pagination, TextField, Tooltip, Typography } from "@mui/material";
+import { Button, CircularProgress, IconButton, Pagination, TextField, Tooltip, Typography } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useContext, useState } from "react";
-import ModalEditUser from "../ModalEditUser/ModalEditUser";
+import ModalFormUser from "../Modais/ModalFormUser/ModalFormUser";
 import Image from "next/image";
 
 export default function ListUsers() {
@@ -15,7 +15,7 @@ export default function ListUsers() {
   const snackbarContext = useContext(SnackbarContext);
 
   const [search, setSearch] = useState<string>('');
-  const [openModalEditUser, setOpenModalEditUser] = useState<boolean>(false);
+  const [openModalFormUser, setOpenModalFormUser] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<Number | any>(1);
   const [usersPerPage] = useState<Number | any>(6);
   const [selectedUser, setSelectedUser] = useState<UserData>();
@@ -41,7 +41,7 @@ export default function ListUsers() {
 
   async function handleUser(user: UserData) {
     await setSelectedUser(user);
-    setOpenModalEditUser(true);
+    setOpenModalFormUser(true);
   }
 
   const filteredUsers = users?.filter(user => {
@@ -63,6 +63,18 @@ export default function ListUsers() {
           <CircularProgress color="success" />
         </div>
       )}
+      <div className="flex justify-end w-full">
+        <Button
+          variant='contained'
+          color='success'
+          size='small'
+          sx={{ width: 160 }}
+          className='bg-green-500'
+          onClick={() => setOpenModalFormUser(true)}
+        >
+          Adicionar usuário
+        </Button>
+      </div>
       {!loadingUsers && currentUsers && filteredUsers &&(
         <>
           <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex justify-between rounded-lg`}>
@@ -139,11 +151,15 @@ export default function ListUsers() {
         </>
       )}
 
-      {openModalEditUser && selectedUser && (
-        <ModalEditUser
+      {openModalFormUser && (
+        <ModalFormUser
           user={selectedUser}
-          open={openModalEditUser}
-          handleClose={() => setOpenModalEditUser(false)}
+          open={openModalFormUser}
+          handleClose={() => {
+            setOpenModalFormUser(false)
+            setSelectedUser({} as UserData);
+            }
+          }
         />
       )}
     </>

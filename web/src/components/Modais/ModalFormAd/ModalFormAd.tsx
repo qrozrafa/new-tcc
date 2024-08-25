@@ -5,7 +5,7 @@ import { Alert, Button, FormControlLabel, FormGroup, Switch, TextField, ToggleBu
 import { DetailAd, TOptions } from '@/type/ads';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TSubjects } from '@/type/subject';
-import { InputTime } from '../inputs/InputTime';
+import { InputTime } from '../../inputs/InputTime';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

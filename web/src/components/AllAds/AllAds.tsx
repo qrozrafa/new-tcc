@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useStore } from "zustand";
 import DeleteAd from "../DeleteAd/DeleteAd";
 import { useContext, useState } from "react";
-import ModalFormAd from "../ModalFormAd/ModalFormAd";
+import ModalFormAd from "../Modais/ModalFormAd/ModalFormAd";
 import { TSubjects } from "@/type/subject";
 import { useSubjectsStore } from "@/store/subjects";
 import { getAllAds } from "@/service/painel";

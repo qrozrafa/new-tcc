@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -17,7 +18,51 @@ export class UserService {
   }
 
   async listUsers() {
-    return await this.prisma.user.findMany({ where: { status: 'ACTIVE' } });
+    const users = await this.prisma.user.findMany({
+      where: { status: 'ACTIVE', role: 'USER' },
+    });
+
+    if (users) {
+      const usersWithoutPassword = users.map((user) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      return usersWithoutPassword;
+    }
+  }
+
+  async listAllUsers() {
+    const users = (await this.prisma.user.findMany()).sort((a, b) => {
+      if (a.createdAt < b.createdAt) {
+        return -1;
+      }
+      if (a.createdAt > b.createdAt) {
+        return 1;
+      }
+      return 0;
+    });
+
+    if (users) {
+      const usersWithoutPassword = users.map((user) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      return usersWithoutPassword;
+    }
+  }
+
+  async listUsersAdmin() {
+    const users = await this.prisma.user.findMany({
+      where: { status: 'ACTIVE', role: 'ADMIN' },
+    });
+
+    if (users) {
+      const usersWithoutPassword = users.map((user) => {
+        const { password, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      return usersWithoutPassword;
+    }
   }
 
   async listUsersDeleted() {
@@ -26,11 +71,30 @@ export class UserService {
 
   async getUserById(id: string) {
     await this.exists(id);
-    return await this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
     });
+
+    if (user) {
+      const { password, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    }
+  }
+
+  async getUserByEmail(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Email não encontrado!');
+    }
+
+    return user;
   }
 
   async updateUser(id: string, data: UpdatePutUserDto) {
@@ -46,7 +110,56 @@ export class UserService {
 
   async updatePartialUser(id: string, data: UpdatePatchUserDto) {
     await this.exists(id);
-    data.password = await bcrypy.hash(data.password, await bcrypy.genSalt());
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: id },
+    });
+
+    if (data.password && data.newPassword) {
+      const passwordMatch = await bcrypy.compare(data.password, user.password);
+
+      if (!passwordMatch) {
+        throw new Error('Senha atual incorreta');
+      }
+
+      const hashedNewPassword = await bcrypy.hash(
+        data.newPassword,
+        await bcrypy.genSalt(),
+      );
+
+      await this.prisma.user.update({
+        where: { id: id },
+        data: { password: hashedNewPassword },
+      });
+
+      return { msg: 'Senha atualizada com sucesso' };
+    }
+
+    return await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data,
+    });
+  }
+
+  async resetPasswordUser(id: string, data: UpdatePatchUserDto) {
+    await this.exists(id);
+
+    if (data.newPassword) {
+      const hashedNewPassword = await bcrypy.hash(
+        data.newPassword,
+        await bcrypy.genSalt(),
+      );
+
+      await this.prisma.user.update({
+        where: { id: id },
+        data: { password: hashedNewPassword },
+      });
+
+      return { msg: 'Senha atualizada com sucesso' };
+    }
+
     return await this.prisma.user.update({
       where: {
         id,
@@ -62,7 +175,7 @@ export class UserService {
         id,
       },
       data: {
-        delete_at: new Date(),
+        deletedAt: new Date(),
         status: 'DELETED',
       },
     });
@@ -75,7 +188,7 @@ export class UserService {
         id,
       },
       data: {
-        delete_at: null,
+        deletedAt: null,
         status: 'ACTIVE',
       },
     });

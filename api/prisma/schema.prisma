@@ -16,7 +16,6 @@ enum UserState {
 enum UserRole {
   USER
   ADMIN
-  SUPER_ADMIN
 }
 
 enum SubjectState {
@@ -27,80 +26,94 @@ enum SubjectState {
 
 enum AdSubjectState {
   ACTIVE
-  SUSPENDED
+  INACTIVE
   DELETED
 }
 
 enum UserAdState {
   ACTIVE
-  DONE
-  PENDDING
   INACTIVE
+  DELETED
+}
+
+enum WeekDay {
+  SUNDAY
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  ALLDAYS
 }
 
 model User {
-  id         String    @id @default(uuid()) @db.Uuid
-  name       String
-  email      String    @unique
-  password   String 
-  cpf        String    @unique
-  ra         String    @unique
-  role       UserRole  @default(USER)
-  created_at DateTime  @default(now())
-  update_at  DateTime  @updatedAt 
-  delete_at  DateTime? 
-  status     UserState @default(ACTIVE)
-  userAd     UserAd[]
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  email     String    @unique
+  password  String
+  cpf       String    @unique
+  ra        String    @unique
+  role      UserRole  @default(USER)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+  status    UserState @default(ACTIVE)
+  image     String?
+  userAd    UserAd[]
 
   @@index([id, name])
   @@map("users")
 }
 
 model Subject {
-  id         String       @id @default(uuid()) @db.Uuid
-  name       String
-  created_at DateTime     @default(now())
-  update_at  DateTime     @updatedAt
-  deleted_at DateTime?    
-  status     SubjectState @default(ACTIVE)
-  userAd     UserAd[]
+  id        String       @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  deletedAt DateTime?    @map("deleted_at")
+  status    SubjectState @default(ACTIVE)
+  image     String?
+  userAd    UserAd[]
 
   @@index([id, name])
   @@map("subjects")
 }
 
 model Ad {
-  id         String         @id @default(uuid()) @db.Uuid
-  name       String
-  weekDay    DateTime
-  hourStart  DateTime
-  hourEnd    DateTime
-  useVoice   Boolean
-  useVideo   Boolean
-  status     AdSubjectState @default(ACTIVE)
-  created_at DateTime       @default(now()) 
-  update_at  DateTime       @updatedAt
-  deleted_at DateTime?     
-  userAd     UserAd[]
+  id        String         @id @default(uuid()) @db.Uuid
+  name      String
+  weekDay   WeekDay[]      @default([]) @map("week_day")
+  hourStart DateTime       @map("hour_start") @db.Time()
+  hourEnd   DateTime       @map("hour_end") @db.Time()
+  useVoice  Boolean        @map("use_voice")
+  useVideo  Boolean        @map("use_video")
+  linkCall  String         @default("") @map("link_call")
+  status    AdSubjectState @default(ACTIVE)
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  deletedAt DateTime?      @map("deleted_at")
+  userAd    UserAd[]
 
   @@index([id, name])
   @@map("ads")
 }
 
 model UserAd {
-  id         String      @id @default(uuid()) @db.Uuid
-  user_id    String      @db.Uuid
-  ad_id      String      @db.Uuid
-  subject_id String      @db.Uuid
-  created_at DateTime    @default(now()) @db.Timestamp(3)
-  update_at  DateTime    @db.Timestamp(3)
-  deleted_at DateTime?   @db.Timestamp(3)
-  status     UserAdState @default(ACTIVE)
+  id        String      @id @default(uuid()) @db.Uuid
+  userId    String      @map("user_id") @db.Uuid
+  adId      String      @map("ad_id") @db.Uuid
+  subjectId String      @map("subject_id") @db.Uuid
+  nameAd    String      @map("name_ad")
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  deletedAt DateTime?   @map("deleted_at")
+  status    UserAdState @default(ACTIVE)
 
-  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  ad      Ad      @relation(fields: [ad_id], references: [id], onDelete: Cascade)
-  subject Subject @relation(fields: [subject_id], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ad      Ad      @relation(fields: [adId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
-  @@index([user_id, subject_id, ad_id])
+  @@index([userId, subjectId, adId])
   @@map("usersAds")
 }

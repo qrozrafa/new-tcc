@@ -4,18 +4,31 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/auth';
 import { useUserStore } from '@/store/user';
 import ModalAccess from '../ModalAccess/ModalAccess';
 import { Fade, Menu, MenuItem } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useStore } from 'zustand';
 import Image from 'next/image';
 import Logo from '../../../public/assets/images/logo.png';
 
 export default function Nav() {
   const router = useRouter();
+
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+
+  const authStore = useAuthStore();
+  const { authenticated } = isClient ? authStore : { authenticated: false };
+
+  const userStore = useUserStore();
+  const { user } = isClient ? userStore : { user: null };
+
   const [openModalAccess, setOpenModalAccess] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -28,11 +41,6 @@ export default function Nav() {
     setAnchorEl(null);
   };
 
-  const authStore = useStore(useAuthStore);
-  const { authenticated } = authStore;
-
-  const userStore = useStore(useUserStore);
-  const { user } = userStore;
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -62,7 +70,7 @@ export default function Nav() {
                 }
               }}
             >
-              <span className='cursor-pointer'>{user?.name ?? 'Entrar'}</span>
+              {user?.name ?? 'Entrar'}
             </Typography>
             {user?.image ? (
               <Image

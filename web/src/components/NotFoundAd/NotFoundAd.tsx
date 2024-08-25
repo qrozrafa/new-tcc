@@ -1,3 +1,4 @@
+"use client"
 import { useAuthStore } from "@/store/auth";
 import useScreenSize from "@/utils/resize";
 import { Button, Typography } from "@mui/material";
@@ -5,12 +6,17 @@ import { Fragment, useState } from "react";
 import ModalFormAd from "../ModalFormAd/ModalFormAd";
 import { useStore } from "zustand";
 import { TSubjects } from "@/type/subject";
+import { useSubjectsStore } from "@/store/subjects";
 
-export function NotFoundAd({ subjects, subjectId, myAds }: {subjects: TSubjects[], subjectId?: string, myAds?: boolean}) {
+export function NotFoundAd({ subjectId, myAds }: { subjectId?: string, myAds?: boolean}) {
   const isMobile = useScreenSize(688);
   const [openModal, setOpenModal] = useState(false);
+
   const authStore = useStore(useAuthStore);
   const { authenticated } = authStore;
+  
+  const subjectsStore = useStore(useSubjectsStore);
+  const { subjects } = subjectsStore;
 
   return (
     <Fragment>

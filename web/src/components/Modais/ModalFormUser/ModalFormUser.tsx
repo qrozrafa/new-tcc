@@ -1,11 +1,11 @@
 import { SnackbarContext } from "@/context/snackbar.context";
 import { createUser, editDataUser } from "@/service/user";
-import { UserData, useUserStore } from "@/store/user";
+import { UserData } from "@/store/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Box, Button, IconButton, InputAdornment, Modal, TextField, Typography } from "@mui/material";
+import { Box, Button, FormControl, IconButton, InputAdornment, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useContext, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -54,7 +54,7 @@ export default function ModalFormUser({open, user, handleClose}: TModalEditUser)
 
   type createUserFormData = z.infer<typeof editData>
 
-  const { register, watch, formState: { errors }, clearErrors, reset, handleSubmit } = useForm<createUserFormData>({
+  const { register, watch, formState: { errors }, clearErrors, reset, handleSubmit, setValue } = useForm<createUserFormData>({
     defaultValues: {
       name: user?.name,
       email: user?.email,
@@ -197,38 +197,53 @@ export default function ModalFormUser({open, user, handleClose}: TModalEditUser)
                 inputProps={{ maxLength: 6 }}
               />
               {!user?.id && (
-                <TextField
-                  variant="standard"
-                  label="Senha:"
-                  placeholder="Digite sua senha"
-                  type={showPassword ? 'text' : 'password'}
-                  color="success"
-                  {...register('password')}
-                  onChange={
-                    () => {
-                      clearErrors('password')
+                <Fragment>
+                  <TextField
+                    variant="standard"
+                    label="Senha:"
+                    placeholder="Digite sua senha"
+                    type={showPassword ? 'text' : 'password'}
+                    color="success"
+                    {...register('password')}
+                    onChange={
+                      () => {
+                        clearErrors('password')
+                      }
                     }
-                  }
-                  error={Boolean(errors.password)}
-                  helperText={errors.password?.message}
-                  size="small"
-                  required
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility:"
-                          onClick={handleClickShowPassword}
-                          onMouseDown={handleMouseDownPassword}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }}
-                />
+                    error={Boolean(errors.password)}
+                    helperText={errors.password?.message}
+                    size="small"
+                    required
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility:"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
+                  />
+                </Fragment>
               )}
+                <FormControl size="small" color="success" variant="standard">
+                  <InputLabel id="demo-simple-select-label">Perfil:</InputLabel>
+                  <Select
+                    id="demo-simple-select"
+                    label='Perfil:'
+                    className="label"
+                    {...register('role')}
+                    defaultValue={user?.role ?? 'USER'}
+                  >
+                    <MenuItem value={'USER'}>Usuário</MenuItem>
+                    <MenuItem value={'ADMIN'}>Administrador</MenuItem>
+                  </Select>
+                </FormControl>
                 <div style={{display: 'flex', gap: 16, alignContent: 'center', marginBottom: 32, justifyContent: 'flex-end' }}>
                   <Button variant="outlined" color="success" onClick={handleClose}>Cancelar</Button>
                   <Button variant="contained" color="success" onClick={onSubmit} disabled={isLoading} className='bg-green-500'>Salvar</Button>

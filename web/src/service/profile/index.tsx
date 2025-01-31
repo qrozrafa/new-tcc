@@ -5,6 +5,6 @@ export async function getAdsByUser(userId: string, last?: boolean) {
     const response = await api.get(`/ads/user/${userId}${last ? '/last' : ''}`);
     return response.data;
   } catch (error) {
-    console.error('Erro carregar ads do usuario:', error);
+    console.error('Erro carregar ads do Usuário:', error);
   }
 }

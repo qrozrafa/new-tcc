@@ -1,36 +1,22 @@
 "use client"
-import useScreenSize from '@/utils/resize';
 // @ts-ignore
-import { Splide, SplideSlide } from '@splidejs/react-splide'
-import '@splidejs/react-splide/css'
-import { useRouter } from 'next/navigation';
+import { Splide, SplideSlide } from '@splidejs/react-splide';
+import '@splidejs/react-splide/css';
 
 import notImg from '../../../public/assets/images/No Image.png';
-import { TSubjects } from '@/type/subject';
 import Image from 'next/image';
 import { CircularProgress, Typography } from '@mui/material';
 
-import { useSubjectsStore } from '@/store/subjects'
 
-import { useQuery } from '@tanstack/react-query'
-import { getSubjects } from '@/service/subject';
-import { useEffect } from 'react';
+import { useCarrouselSubject } from './useCarrouselSubject';
 
 export function CarrouselSubject() {
-  const useSubjects = useSubjectsStore();
-  const router = useRouter();
-  const isMobile = useScreenSize(688);
-
-  const { data: subjects, isFetching: loadingSubjects } = useQuery<TSubjects[]>({
-    queryKey: ['subjects'],
-    queryFn: async () => {
-      return await getSubjects();
-    },
-  });
-
-  useEffect(() => {
-    useSubjects.setSubjects(subjects || []);
-  }, [loadingSubjects === false])
+  const {
+    router,
+    isMobile,
+    subjects,
+    loadingSubjects
+  } = useCarrouselSubject();
 
   return (
     <>
@@ -39,8 +25,8 @@ export function CarrouselSubject() {
           <CircularProgress color="success" />
         </div>
       )}
-      {subjects?.length === 0 && (
-        <Typography variant='h6' className='text-green-500 font-bold'>Nenhuma matéria encontrada</Typography>
+      {subjects?.length === 0  || !subjects && !loadingSubjects && (
+        <Typography variant='h6' className='text-zinc-500 font-bold text-center'>Nenhuma matéria encontrada</Typography>
       )}
       {subjects && subjects?.length > 0 && !loadingSubjects && (
         <div className='max-w-7xl w-auto'>
@@ -89,7 +75,6 @@ export function CarrouselSubject() {
                   <Typography
                     variant='subtitle1'
                     textAlign='start'
-                    justifySelf={'end'}
                     className='text-green-500 px-2'
                     fontWeight={'bold'}
                   >
@@ -98,7 +83,6 @@ export function CarrouselSubject() {
                   <Typography
                     variant='subtitle2'
                     textAlign='start'
-                    justifySelf={'end'}
                     className='text-zinc-400 px-2'
                   >
                     {subject.countAds > 1 ? `${subject.countAds} anúncios` : `${subject.countAds} anúncio`}

@@ -19,6 +19,7 @@ export type DetailAd = {
   adId:      string;
   subjectId: string;
   nameAd:    string;
+  subjectName: string | undefined;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;

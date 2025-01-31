@@ -41,7 +41,7 @@ export async function getUsers() {
     const response = await api.get(`/users/all`);
     return response.data;
   } catch (error) {
-    console.error('Erro ao carregar usuarios:', error);
+    console.error('Erro ao carregar Usuários:', error);
   }
 }
 
@@ -50,7 +50,7 @@ export async function disableUser(userId: string) {
     const response = await api.delete(`/users/${userId}`);
     return response.data;
   } catch (error) {
-    console.error('Erro ao deletar usuario:', error);
+    console.error('Erro ao deletar Usuário:', error);
   }
 }
 
@@ -59,7 +59,7 @@ export async function activeUser(userId: string) {
     const response = await api.put(`/users/restore/${userId}`);
     return response.data;
   } catch (error) {
-    console.error('Erro ao ativar usuario:', error);
+    console.error('Erro ao ativar Usuário:', error);
   }
 }
 
@@ -73,7 +73,7 @@ export async function uploadImage(userId?: string, data?: any) {
 
     return response.data;
   } catch (error) {
-    console.error('Erro ao ativar usuario:', error);
+    console.error('Erro ao ativar Usuário:', error);
   }
 }
 
@@ -82,6 +82,6 @@ export async function deleteImage(userId: string) {
     const response = await api.delete(`/users/${userId}/image`);
     return response.data;
   } catch (error) {
-    console.error('Erro ao ativar usuario:', error);
+    console.error('Erro ao ativar Usuário:', error);
   }
 }

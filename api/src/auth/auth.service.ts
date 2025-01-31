@@ -11,7 +11,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthRegisterDTO } from './dto/register-auth.dto';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
-import { UpdatePatchUserDto } from 'src/user/dto/update-patch-user.dto';
 @Injectable()
 export class AuthService {
   private audience = 'users';

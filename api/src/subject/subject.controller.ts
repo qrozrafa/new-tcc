@@ -34,6 +34,7 @@ export class SubjectController {
   @Roles(Role.ADMIN)
   @Post()
   async create(@Body() data: CreateSubjectDto) {
+    console.log(data);
     return this.subjectService.createSubject(data);
   }
 

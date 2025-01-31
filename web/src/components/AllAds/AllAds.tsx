@@ -58,11 +58,14 @@ export default function AllAds() {
   const filteredAds = dataSubjectAds?.filter(ad => {
     const foundAd = ad.nameAd.toLowerCase().includes(search.toLowerCase());
     const foundCreator = ad.nameUser.toLowerCase().includes(search.toLowerCase());
+    const foundSubject = ad.subjectName?.toLowerCase().includes(search.toLowerCase());
     
     if (foundAd) {
       return foundAd;
     } else if (foundCreator) {
       return foundCreator;
+    } else if (foundSubject) {
+      return foundSubject;
     }
   })
 
@@ -85,6 +88,7 @@ export default function AllAds() {
       {!loadingSubjectAds && currentPosts && filteredAds && (
         <>
           <FilterAd
+            title="Digita a matéria, criador ou disciplina"
             search={search}
             filterLastAds={filterLastAds}
             onSearch={setSearch}

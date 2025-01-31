@@ -3,20 +3,21 @@ import { Button, TextField, Typography } from "@mui/material";
 import { Fragment, useState } from "react";
 
 type TFilterAd = {
+  title?: string;
   search: string
   filterLastAds: boolean
   onSearch: (value: string) => void
   onFilteredDate: (value: boolean) => void
 }
 
-export function FilterAd({ filterLastAds, search, onFilteredDate, onSearch }: TFilterAd) {
+export function FilterAd({ title = '', filterLastAds, search, onFilteredDate, onSearch }: TFilterAd) {
   return (
     <Fragment>
       <div className={`w-full mx-auto mt-4 gap-4 bg-zinc-200 py-4 px-3 flex justify-between rounded-lg`}>
         <TextField
           variant="standard"
           color="success"
-          placeholder="Digita a matéria ou criador"
+          placeholder={title ? title : "Digita a matéria ou criador"}
           className="w-full border-none"
           value={search}
           onChange={(e) => onSearch(e.target.value)}

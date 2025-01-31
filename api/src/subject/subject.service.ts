@@ -15,6 +15,7 @@ export class SubjectService {
     private readonly adService: AdService,
   ) {}
   async createSubject(data: CreateSubjectDto) {
+    console.log(data);
     return await this.prisma.subject.create({
       data,
     });
@@ -25,21 +26,22 @@ export class SubjectService {
       await this.prisma.subject.findMany({
         where: { status: 'ACTIVE' },
       })
-    ).sort((a, b) => {
-      if (a.name < b.name) {
-        return -1;
-      }
-      if (a.name > b.name) {
-        return 1;
-      }
-      return 0;
-    });
+    ).sort((a, b) => a.name.localeCompare(b.name));
 
-    if (subjects) {
+    if (subjects.length) {
       const subjectAdsWhithCount = await Promise.all(
         subjects.map(async (subject) => {
           const subjectAd = await this.userAdService.getSubjectAds(subject.id);
-          const countAds = subjectAd.length;
+
+          const activeSubjectAd = await Promise.all(
+            subjectAd.map(async (ad) => {
+              const user = await this.userService.getUserById(ad.userId);
+              return user && user.status === 'ACTIVE' ? ad : null;
+            }),
+          );
+
+          const countAds = activeSubjectAd.filter(Boolean).length;
+
           return {
             ...subject,
             countAds,
@@ -48,24 +50,28 @@ export class SubjectService {
       );
       return subjectAdsWhithCount;
     }
+    return [];
   }
 
   async listAllSubjects() {
-    const subjects = (await this.prisma.subject.findMany()).sort((a, b) => {
-      if (a.name < b.name) {
-        return -1;
-      }
-      if (a.name > b.name) {
-        return 1;
-      }
-      return 0;
-    });
+    const subjects = (await this.prisma.subject.findMany()).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
 
-    if (subjects) {
+    if (subjects.length) {
       const subjectAdsWhithCount = await Promise.all(
         subjects.map(async (subject) => {
           const subjectAd = await this.userAdService.getSubjectAds(subject.id);
-          const countAds = subjectAd.length;
+
+          const activeSubjectAd = await Promise.all(
+            subjectAd.map(async (ad) => {
+              const user = await this.userService.getUserById(ad.userId);
+              return user && user.status === 'ACTIVE' ? ad : null;
+            }),
+          );
+
+          const countAds = activeSubjectAd.filter(Boolean).length;
+
           return {
             ...subject,
             countAds,
@@ -74,6 +80,7 @@ export class SubjectService {
       );
       return subjectAdsWhithCount;
     }
+    return [];
   }
 
   async listSubjectAds(subjectId: string) {
@@ -88,6 +95,10 @@ export class SubjectService {
             );
             const detailAd = await this.adService.getAdById(subjectAd.adId);
 
+            if (!detailUser || detailUser.status !== 'ACTIVE') {
+              return null;
+            }
+
             const { name: nameUser, id } = detailUser;
             return {
               nameUser,
@@ -97,18 +108,18 @@ export class SubjectService {
             };
           }),
         )
-      ).sort((a, b) => {
-        if (a.createdAt < b.createdAt) {
-          return 1;
-        }
-        if (a.createdAt > b.createdAt) {
-          return -1;
-        }
-        return 0;
-      });
+      )
+        .filter(Boolean)
+        .sort((a, b) => {
+          if (a.createdAt < b.createdAt) return 1;
+          if (a.createdAt > b.createdAt) return -1;
+          return 0;
+        });
 
       return detailsUserAndAds;
     }
+
+    return [];
   }
 
   async listLastSubjectAds(subjectId: string) {
@@ -133,12 +144,8 @@ export class SubjectService {
           }),
         )
       ).sort((a, b) => {
-        if (a.createdAt < b.createdAt) {
-          return -1;
-        }
-        if (a.createdAt > b.createdAt) {
-          return 1;
-        }
+        if (a.createdAt < b.createdAt) return 1;
+        if (a.createdAt > b.createdAt) return -1;
         return 0;
       });
 
@@ -212,58 +219,54 @@ export class SubjectService {
   async getAllAdsByAllUsersEndSubjects() {
     const listUsersAds = await this.userAdService.getUsersAds();
 
-    const fitUsersAds = listUsersAds.map((userAd) => {
-      return {
-        ...userAd,
-        userAdId: userAd.id,
-      };
-    });
+    const fitUsersAds = listUsersAds.map((userAd) => ({
+      ...userAd,
+      userAdId: userAd.id,
+    }));
 
-    if (fitUsersAds) {
-      const listUsers = await this.prisma.user.findMany();
-
-      const fitUsers = listUsers.map((user) => {
-        return {
-          ...user,
-          nameUser: user.name,
-        };
+    if (fitUsersAds.length > 0) {
+      const listUsers = await this.prisma.user.findMany({
+        where: { status: 'ACTIVE' },
       });
+
+      const fitUsers = listUsers.map((user) => ({
+        ...user,
+        nameUser: user.name,
+      }));
 
       const listAds = await this.prisma.ad.findMany({
         where: { status: 'ACTIVE' },
       });
 
-      const ads = fitUsersAds.map((userAd) => {
-        const ad = listAds.find((ad) => ad.id === userAd.adId);
-        return {
-          ...userAd,
-          ...ad,
-        };
-      });
+      const ads = fitUsersAds
+        .map((userAd) => {
+          const ad = listAds.find((ad) => ad.id === userAd.adId);
+          return ad ? { ...userAd, ...ad } : null;
+        })
+        .filter(Boolean);
 
       const listSubjects = await this.prisma.subject.findMany({
         where: { status: 'ACTIVE' },
       });
 
-      const subjects = ads.map((ad) => {
-        const subject = listSubjects.find((subject) => subject.id === ad.id);
-        return { ...ad, ...subject };
-      });
+      const subjects = ads
+        .map((ad) => {
+          const subject = listSubjects.find(
+            (subject) => subject.id === ad.subjectId,
+          );
+          return subject ? { ...ad, subjectName: subject.name } : null;
+        })
+        .filter(Boolean);
 
       return subjects
         .map((subject) => {
           const user = fitUsers.find((user) => user.id === subject.userId);
-          return { ...subject, nameUser: user.nameUser };
+          return user ? { ...subject, nameUser: user.nameUser } : null;
         })
-        .sort((a, b) => {
-          if (a.createdAt < b.createdAt) {
-            return 1;
-          }
-          if (a.createdAt > b.createdAt) {
-            return -1;
-          }
-          return 0;
-        });
+        .filter(Boolean)
+        .sort((a, b) =>
+          a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0,
+        );
     }
     return [];
   }
@@ -271,58 +274,54 @@ export class SubjectService {
   async getAllLastAdsByAllUsersEndSubjects() {
     const listUsersAds = await this.userAdService.getUsersAds();
 
-    const fitUsersAds = listUsersAds.map((userAd) => {
-      return {
-        ...userAd,
-        userAdId: userAd.id,
-      };
-    });
+    const fitUsersAds = listUsersAds.map((userAd) => ({
+      ...userAd,
+      userAdId: userAd.id,
+    }));
 
-    if (fitUsersAds) {
-      const listUsers = await this.prisma.user.findMany();
-
-      const fitUsers = listUsers.map((user) => {
-        return {
-          ...user,
-          nameUser: user.name,
-        };
+    if (fitUsersAds.length > 0) {
+      const listUsers = await this.prisma.user.findMany({
+        where: { status: 'ACTIVE' },
       });
+
+      const fitUsers = listUsers.map((user) => ({
+        ...user,
+        nameUser: user.name,
+      }));
 
       const listAds = await this.prisma.ad.findMany({
         where: { status: 'ACTIVE' },
       });
 
-      const ads = fitUsersAds.map((userAd) => {
-        const ad = listAds.find((ad) => ad.id === userAd.adId);
-        return {
-          ...userAd,
-          ...ad,
-        };
-      });
+      const ads = fitUsersAds
+        .map((userAd) => {
+          const ad = listAds.find((ad) => ad.id === userAd.adId);
+          return ad ? { ...userAd, ...ad } : null;
+        })
+        .filter(Boolean);
 
       const listSubjects = await this.prisma.subject.findMany({
         where: { status: 'ACTIVE' },
       });
 
-      const subjects = ads.map((ad) => {
-        const subject = listSubjects.find((subject) => subject.id === ad.id);
-        return { ...ad, ...subject };
-      });
+      const subjects = ads
+        .map((ad) => {
+          const subject = listSubjects.find(
+            (subject) => subject.id === ad.subjectId,
+          );
+          return subject ? { ...ad, subjectName: subject.name } : null;
+        })
+        .filter(Boolean);
 
       return subjects
         .map((subject) => {
           const user = fitUsers.find((user) => user.id === subject.userId);
-          return { ...subject, nameUser: user.nameUser };
+          return user ? { ...subject, nameUser: user.nameUser } : null;
         })
-        .sort((a, b) => {
-          if (a.createdAt < b.createdAt) {
-            return -1;
-          }
-          if (a.createdAt > b.createdAt) {
-            return 1;
-          }
-          return 0;
-        });
+        .filter(Boolean)
+        .sort((a, b) =>
+          a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0,
+        );
     }
     return [];
   }

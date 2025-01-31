@@ -1,11 +1,10 @@
-import { Optional } from '@nestjs/common';
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class CreateSubjectDto {
   @IsString()
   name: string;
 
-  @Optional()
+  @IsOptional()
   @IsString()
   image: string;
 }

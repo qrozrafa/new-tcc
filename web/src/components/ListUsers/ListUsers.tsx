@@ -31,10 +31,10 @@ export default function ListUsers() {
   async function handleVisibleUser(user: UserData) {
     if (user.status === 'ACTIVE') { 
       await disableUser(user.id as string);
-      snackbarContext.success('Usuario disabilidata com sucesso!');
+      snackbarContext.success('Usuário desabilitada com sucesso!');
     } else {
       await activeUser(user.id as string);
-      snackbarContext.success('Usuario habilitada com sucesso!');
+      snackbarContext.success('Usuário habilitada com sucesso!');
     }
     await queryClient.refetchQueries({ queryKey: ['users'] });
   }
@@ -116,12 +116,12 @@ export default function ListUsers() {
                     </div>
                   </div>
                   <div className={`flex gap-2 self-start`}>
-                    <Tooltip title="Editar usuario">
+                    <Tooltip title="Editar Usuário">
                       <IconButton color="success" onClick={() => handleUser(user)}>
                         <Edit color="disabled"/>
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title={user.status === 'ACTIVE' ? 'Desabilitar usuario' : 'Habilitar usuario'}>
+                    <Tooltip title={user.status === 'ACTIVE' ? 'Desabilitar Usuário' : 'Habilitar Usuário'}>
                       <IconButton color="success"  onClick={() => handleVisibleUser(user)}>
                         {user.status === 'ACTIVE' ? <Visibility color="disabled"/> : <VisibilityOff color="disabled"/>}
                       </IconButton>

@@ -39,6 +39,7 @@ export function CardAd({ postAd, onEdit, onDelete, onClick }: CardAdProps) {
           <div className="flex justify-between">
             <div className={`flex flex-col gap-1`}>
               <Typography variant='body1'className='font-bold text-green-500'><b>{ad.name}</b></Typography>
+              {ad.subjectName && <Typography variant='body1' className="text-zinc-700">Disciplina: <b>{ad.subjectName}</b></Typography>}
               {ad.nameUser && <Typography variant='body1' className="text-zinc-700">Criado por: <b>{ad.nameUser}</b></Typography>}
               <Typography variant='body1'className="text-zinc-700">Dias: <b>{weekDaysSelected(ad.weekDay)}</b></Typography>
               <Typography variant='body1' className="text-zinc-700">Horário: <b>{format(ad.hourStart, 'HH:mm')} - {format(ad.hourEnd, 'HH:mm')}</b></Typography>

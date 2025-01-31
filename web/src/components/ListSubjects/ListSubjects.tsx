@@ -33,10 +33,10 @@ export default function ListSubjects() {
   async function handleVisibleSubjects(subject: TSubjects) {
     if (subject.status === 'ACTIVE') { 
       await disableSubject(subject.id as string);
-      snackbarContext.success('Diciplina disabilidata com sucesso!');
+      snackbarContext.success('Disciplina desabilitada com sucesso!');
     } else {
       await activeSubject(subject.id as string);
-      snackbarContext.success('Diciplina habilitada com sucesso!');
+      snackbarContext.success('Disciplina habilitada com sucesso!');
     }
     await queryClient.refetchQueries({ queryKey: ['subjects'] });
     await queryClient.refetchQueries({ queryKey: ['allSubjects'] });
@@ -111,7 +111,7 @@ export default function ListSubjects() {
             <TextField
               variant="standard"
               color="success"
-              placeholder="Digita a diciplina que procura"
+              placeholder="Digita a disciplina que procura"
               className="w-full border-none"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -126,16 +126,16 @@ export default function ListSubjects() {
               variant='contained'
               color='success'
               size='small'
-              sx={{ width: 160 }}
+              sx={{ width: 180 }}
               className='bg-green-500'
               onClick={() => setOpenModalEditSubject(true)}
             >
-              Adicionar diciplina
+              Adicionar disciplina
             </Button>
           </div>
 
           {currentSubjects?.length === 0 && (
-            <Typography variant="body1" className="text-zinc-400 text-center">Nenhuma diciplina encontrada</Typography>
+            <Typography variant="body1" className="text-zinc-400 text-center">Nenhuma disciplina encontrada</Typography>
           )}
 
           {currentSubjects?.length > 0 && (
@@ -151,12 +151,12 @@ export default function ListSubjects() {
                     </div>
                   </div>
                   <div className={`flex gap-2 self-start`}>
-                    <Tooltip title="Editar diciplina">
+                    <Tooltip title="Editar disciplina">
                       <IconButton color="success" onClick={() => handleSubject(subject)}>
                         <Edit color="disabled"/>
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title={subject.status === 'ACTIVE' ? 'Desabilitar diciplina' : 'Habilitar diciplina'}>
+                    <Tooltip title={subject.status === 'ACTIVE' ? 'Desabilitar disciplina' : 'Habilitar disciplina'}>
                       <IconButton color="success"  onClick={() => handleVisibleSubjects(subject)}>
                         {subject.status === 'ACTIVE' ? <Visibility color="disabled"/> : <VisibilityOff color="disabled"/>}
                       </IconButton>
